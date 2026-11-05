@@ -7,15 +7,13 @@ import {
   UploadCloud,
   CheckCircle2,
   Mic,
-  MicOff,
   Sparkles,
   ChevronDown,
-  Layers,
   ArrowRight,
   Headphones,
   Sliders,
   Volume2,
-  AlertCircle,
+  Zap,
 } from "lucide-react";
 import {
   TARGET_ROLES,
@@ -25,6 +23,7 @@ import {
   DEFAULT_RESUME,
 } from "../lib/mockData";
 import { ResumeProfile, InterviewSettings } from "../types/interview";
+import { StickyPaperclip, LinedPaperDoodleLeft } from "./SketchDoodles";
 
 interface PreFlightModalProps {
   settings: InterviewSettings;
@@ -86,36 +85,33 @@ export function PreFlightModal({
   };
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto px-4 py-8 sm:py-12 flex flex-col items-center">
-      {/* Background Decorative Glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[350px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
-
+    <div className="relative w-full max-w-4xl mx-auto px-4 py-6 sm:py-10 flex flex-col items-center">
       {/* Main Pre-Flight Card */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: "easeOut" }}
-        className="w-full relative z-10 glass-panel-elevated rounded-3xl p-6 sm:p-9 space-y-8"
+        className="w-full relative z-10 bg-white rounded-3xl border-2 border-[#111815] p-6 sm:p-9 space-y-8 shadow-xl"
       >
         {/* Header Intro */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#27272a]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#E5E0D0]">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded text-[11px] font-mono uppercase font-semibold bg-indigo-500/15 text-indigo-400 border border-indigo-500/25">
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono uppercase font-bold bg-[#FEF08A] text-[#713F12] border border-[#FDE047]">
                 Pre-Flight Setup
               </span>
-              <span className="text-xs text-zinc-500">Step 1 of 2</span>
+              <span className="text-xs text-zinc-500 font-medium">Session Calibration</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#111815]">
               MockPulse Voice Agent Setup
             </h1>
-            <p className="text-xs sm:text-sm text-zinc-400">
+            <p className="text-xs sm:text-sm text-zinc-600 font-medium">
               Calibrate role criteria, test your audio input, and ingest your resume for real-time question steering.
             </p>
           </div>
 
-          <div className="flex items-center gap-2 self-start sm:self-auto px-3 py-1.5 rounded-xl bg-zinc-900/90 border border-zinc-800 text-xs text-zinc-300">
-            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+          <div className="flex items-center gap-2 self-start sm:self-auto px-3 py-1.5 rounded-full bg-[#DCFCE7] border border-[#86EFAC] text-xs font-bold text-[#166534]">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
             <span>AI Voice Pipeline Online</span>
           </div>
         </div>
@@ -124,7 +120,7 @@ export function PreFlightModal({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Target Role */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-zinc-300 flex items-center justify-between">
+            <label className="text-xs font-bold text-[#111815] flex items-center justify-between">
               <span>Target Engineering Role</span>
               <span className="text-[10px] text-zinc-500 font-normal">Primary</span>
             </label>
@@ -132,21 +128,21 @@ export function PreFlightModal({
               <select
                 value={settings.targetRole}
                 onChange={(e) => onUpdateSettings({ targetRole: e.target.value })}
-                className="w-full appearance-none px-3.5 py-2.5 rounded-xl bg-zinc-950/70 border border-[#27272a] text-zinc-100 text-xs sm:text-sm font-medium focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 cursor-pointer transition-colors"
+                className="w-full appearance-none px-3.5 py-2.5 rounded-xl bg-[#FAF8EE] border border-[#E5E0D0] text-[#111815] text-xs sm:text-sm font-bold focus:outline-none focus:border-[#111815] cursor-pointer transition-colors"
               >
                 {TARGET_ROLES.map((role) => (
-                  <option key={role} value={role} className="bg-zinc-900 text-zinc-100">
+                  <option key={role} value={role} className="bg-white text-[#111815]">
                     {role}
                   </option>
                 ))}
               </select>
-              <ChevronDown className="w-4 h-4 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <ChevronDown className="w-4 h-4 text-zinc-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
           </div>
 
           {/* Experience Level */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-zinc-300 flex items-center justify-between">
+            <label className="text-xs font-bold text-[#111815] flex items-center justify-between">
               <span>Experience Level</span>
               <span className="text-[10px] text-zinc-500 font-normal">Expectations</span>
             </label>
@@ -154,37 +150,37 @@ export function PreFlightModal({
               <select
                 value={settings.experienceLevel}
                 onChange={(e) => onUpdateSettings({ experienceLevel: e.target.value })}
-                className="w-full appearance-none px-3.5 py-2.5 rounded-xl bg-zinc-950/70 border border-[#27272a] text-zinc-100 text-xs sm:text-sm font-medium focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 cursor-pointer transition-colors"
+                className="w-full appearance-none px-3.5 py-2.5 rounded-xl bg-[#FAF8EE] border border-[#E5E0D0] text-[#111815] text-xs sm:text-sm font-bold focus:outline-none focus:border-[#111815] cursor-pointer transition-colors"
               >
                 {EXPERIENCE_LEVELS.map((lvl) => (
-                  <option key={lvl} value={lvl} className="bg-zinc-900 text-zinc-100">
+                  <option key={lvl} value={lvl} className="bg-white text-[#111815]">
                     {lvl}
                   </option>
                 ))}
               </select>
-              <ChevronDown className="w-4 h-4 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <ChevronDown className="w-4 h-4 text-zinc-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
           </div>
 
           {/* Interview Round */}
           <div className="space-y-2">
-            <label className="text-xs font-semibold text-zinc-300 flex items-center justify-between">
+            <label className="text-xs font-bold text-[#111815] flex items-center justify-between">
               <span>Interview Round Type</span>
-              <span className="text-[10px] text-indigo-400 font-normal">Active Focus</span>
+              <span className="text-[10px] text-[#C24B1B] font-bold">Active Focus</span>
             </label>
             <div className="relative">
               <select
                 value={settings.roundType}
                 onChange={(e) => onUpdateSettings({ roundType: e.target.value })}
-                className="w-full appearance-none px-3.5 py-2.5 rounded-xl bg-zinc-950/70 border border-[#27272a] text-zinc-100 text-xs sm:text-sm font-medium focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 cursor-pointer transition-colors"
+                className="w-full appearance-none px-3.5 py-2.5 rounded-xl bg-[#FAF8EE] border border-[#E5E0D0] text-[#111815] text-xs sm:text-sm font-bold focus:outline-none focus:border-[#111815] cursor-pointer transition-colors"
               >
                 {ROUND_TYPES.map((rnd) => (
-                  <option key={rnd} value={rnd} className="bg-zinc-900 text-zinc-100">
+                  <option key={rnd} value={rnd} className="bg-white text-[#111815]">
                     {rnd}
                   </option>
                 ))}
               </select>
-              <ChevronDown className="w-4 h-4 text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <ChevronDown className="w-4 h-4 text-zinc-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
           </div>
         </div>
@@ -192,8 +188,8 @@ export function PreFlightModal({
         {/* 2. Resume Upload Dropzone */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-semibold text-zinc-300 flex items-center gap-1.5">
-              <FileText className="w-4 h-4 text-indigo-400" />
+            <label className="text-xs font-bold text-[#111815] flex items-center gap-1.5">
+              <FileText className="w-4 h-4 text-[#C24B1B]" />
               <span>Resume & Project Context Ingestion</span>
             </label>
             <button
@@ -201,7 +197,7 @@ export function PreFlightModal({
               onClick={() => {
                 onUpdateResume(DEFAULT_RESUME);
               }}
-              className="text-[11px] text-indigo-400 hover:text-indigo-300 underline font-medium transition-colors"
+              className="text-[11px] text-[#C24B1B] hover:underline font-bold transition-colors cursor-pointer"
             >
               Use Monu&apos;s Sample Resume
             </button>
@@ -212,10 +208,10 @@ export function PreFlightModal({
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
-            className={`group relative flex flex-col sm:flex-row items-center justify-between p-5 rounded-2xl border border-dashed transition-all cursor-pointer ${
+            className={`group relative flex flex-col sm:flex-row items-center justify-between p-5 rounded-2xl border-2 border-dashed transition-all cursor-pointer ${
               isDragging
-                ? "border-indigo-500 bg-indigo-950/30 shadow-lg shadow-indigo-500/10"
-                : "border-[#27272a] bg-zinc-950/50 hover:bg-zinc-900/60 hover:border-zinc-700"
+                ? "border-[#111815] bg-[#FEF08A]/30 shadow-md"
+                : "border-[#D4CEB8] bg-[#FAF8EE] hover:bg-[#F4F1E4] hover:border-[#111815]"
             }`}
           >
             <input
@@ -231,60 +227,60 @@ export function PreFlightModal({
             />
 
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 group-hover:scale-105 transition-transform">
+              <div className="w-12 h-12 rounded-2xl bg-[#FEF08A] border border-[#FDE047] flex items-center justify-center text-[#713F12] group-hover:scale-105 transition-transform shadow-xs">
                 <UploadCloud className="w-6 h-6" />
               </div>
               <div className="space-y-1 text-center sm:text-left">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-zinc-100">
+                  <span className="text-sm font-bold text-[#111815]">
                     {resume.fileName || "Upload Candidate Resume (PDF, DOCX)"}
                   </span>
                   {isParsing ? (
-                    <span className="text-[10px] text-indigo-400 animate-pulse">
+                    <span className="text-[10px] text-[#C24B1B] font-bold animate-pulse">
                       Parsing entities...
                     </span>
                   ) : (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#DCFCE7] text-[#166534] border border-[#86EFAC] flex items-center gap-1">
                       <CheckCircle2 className="w-3 h-3" />
                       Parsed
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs text-zinc-500 font-medium">
                   {resume.parsedSummary || "Drag and drop or click to browse. Max 10MB."}
                 </p>
               </div>
             </div>
 
-            {/* Extracted project tags preview */}
+            {/* Extracted project tags preview styled as pastel badges */}
             <div className="mt-3 sm:mt-0 flex flex-wrap sm:flex-nowrap items-center gap-2">
-              <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-zinc-900 border border-zinc-800 text-zinc-300">
+              <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#FEF08A] border border-[#FDE047] text-[#713F12]">
                 {resume.projectsCount} Projects Detected
               </span>
-              <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-zinc-900 border border-zinc-800 text-zinc-300">
+              <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#F3E8FF] border border-[#E9D5FF] text-[#581C87]">
                 {resume.skillsCount} Skills Parsed
               </span>
-              <span className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-indigo-950/60 border border-indigo-500/30 text-indigo-300">
-                {resume.alignmentScore}% Role Alignment
+              <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#DCFCE7] border border-[#86EFAC] text-[#166534]">
+                {resume.alignmentScore}% Match
               </span>
             </div>
           </div>
         </div>
 
         {/* 3. Mic Check Bar & Live Audio Input Meter */}
-        <div className="space-y-3 p-5 rounded-2xl bg-zinc-950/60 border border-[#27272a]">
+        <div className="space-y-3 p-5 rounded-2xl bg-[#FAF8EE] border border-[#E5E0D0]">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <Headphones className="w-4 h-4 text-sky-400" />
-                <span className="text-xs font-semibold text-zinc-200">
+                <Headphones className="w-4 h-4 text-[#C24B1B]" />
+                <span className="text-xs font-bold text-[#111815]">
                   Live Microphone Calibration
                 </span>
-                <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-sky-500/15 text-sky-400">
+                <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-[#FEF08A] text-[#713F12]">
                   Web Audio API
                 </span>
               </div>
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-zinc-600 font-medium">
                 Ensure your vocal audio input is loud and clear for the speech recognition engine.
               </p>
             </div>
@@ -293,10 +289,10 @@ export function PreFlightModal({
             <button
               type="button"
               onClick={onToggleMicTest}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all active:scale-95 shadow-sm ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all active:scale-95 shadow-xs cursor-pointer ${
                 isMicTesting
-                  ? "bg-sky-500 text-slate-950 hover:bg-sky-400 shadow-sky-500/25"
-                  : "bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700"
+                  ? "bg-[#C24B1B] text-white shadow-md shadow-[#C24B1B]/20"
+                  : "bg-[#111815] hover:bg-[#202e26] text-white"
               }`}
             >
               {isMicTesting ? (
@@ -315,14 +311,14 @@ export function PreFlightModal({
 
           {/* Live audio level meter bar */}
           <div className="space-y-2 pt-2">
-            <div className="flex items-center justify-between text-[11px] text-zinc-400">
+            <div className="flex items-center justify-between text-[11px] text-zinc-600">
               <span className="flex items-center gap-2">
                 <span
                   className={`w-2 h-2 rounded-full ${
-                    isMicTesting ? "bg-emerald-400 animate-pulse" : "bg-zinc-600"
+                    isMicTesting ? "bg-emerald-500 animate-pulse" : "bg-zinc-400"
                   }`}
                 />
-                <span>
+                <span className="font-medium">
                   {isMicTesting
                     ? micVolume > 15
                       ? "Microphone ready • Optimal vocal gain"
@@ -331,19 +327,19 @@ export function PreFlightModal({
                 </span>
               </span>
               <span className="font-mono text-zinc-500">
-                Peak: <strong className="text-zinc-300">{micDb} dB</strong> / Volume: {micVolume}%
+                Peak: <strong className="text-[#111815]">{micDb} dB</strong> / Volume: {micVolume}%
               </span>
             </div>
 
             {/* Spectrum Equalizer Bar Meter */}
-            <div className="w-full h-3 rounded-full bg-zinc-900 border border-zinc-800 overflow-hidden flex items-center p-0.5">
+            <div className="w-full h-3 rounded-full bg-white border border-[#E5E0D0] overflow-hidden flex items-center p-0.5">
               <div
                 className={`h-full rounded-full transition-all duration-75 ${
                   micVolume > 80
-                    ? "bg-gradient-to-r from-emerald-500 via-amber-400 to-red-500"
+                    ? "bg-gradient-to-r from-emerald-500 via-amber-400 to-[#C24B1B]"
                     : micVolume > 20
-                    ? "bg-gradient-to-r from-sky-500 to-emerald-400"
-                    : "bg-zinc-700"
+                    ? "bg-gradient-to-r from-[#111815] to-[#C24B1B]"
+                    : "bg-zinc-400"
                 }`}
                 style={{ width: `${Math.max(4, micVolume)}%` }}
               />
@@ -355,7 +351,7 @@ export function PreFlightModal({
                 <div
                   key={i}
                   className={`w-full rounded-t-sm transition-all duration-75 ${
-                    isMicTesting ? "bg-sky-400/80" : "bg-zinc-800"
+                    isMicTesting ? "bg-[#C24B1B]" : "bg-zinc-300"
                   }`}
                   style={{ height: `${Math.max(2, Math.min(16, (val / 100) * 16))}px` }}
                 />
@@ -365,14 +361,14 @@ export function PreFlightModal({
         </div>
 
         {/* 4. AI Voice Model Selector */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-zinc-950/40 border border-zinc-800/80">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-[#FAF8EE] border border-[#E5E0D0]">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+            <div className="w-9 h-9 rounded-xl bg-[#F3E8FF] border border-[#E9D5FF] flex items-center justify-center text-[#581C87]">
               <Volume2 className="w-4 h-4" />
             </div>
             <div>
-              <span className="text-xs font-semibold text-zinc-200">Interviewer AI Voice Persona</span>
-              <p className="text-[11px] text-zinc-400">Ultra-natural neural speech with dynamic inflection</p>
+              <span className="text-xs font-bold text-[#111815]">Interviewer AI Voice Persona</span>
+              <p className="text-[11px] text-zinc-500 font-medium">Neural speech with dynamic conversational inflection</p>
             </div>
           </div>
 
@@ -384,7 +380,7 @@ export function PreFlightModal({
                   voiceModel: e.target.value as InterviewSettings["voiceModel"],
                 })
               }
-              className="px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-medium text-zinc-200 focus:outline-none focus:border-indigo-500"
+              className="px-3.5 py-2 rounded-xl bg-white border border-[#E5E0D0] text-xs font-bold text-[#111815] focus:outline-none focus:border-[#111815]"
             >
               {VOICE_MODELS.map((v) => (
                 <option key={v} value={v}>
@@ -397,27 +393,21 @@ export function PreFlightModal({
 
         {/* 5. Large Primary CTA: Launch Voice Interview */}
         <div className="pt-2 flex flex-col items-center gap-3">
-          <div className="relative group w-full sm:w-auto">
-            {/* Pulsing Gradient Ring */}
-            <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-indigo-500 via-sky-500 to-indigo-500 opacity-70 blur-md group-hover:opacity-100 animate-pulse-ring pointer-events-none" />
-
-            <button
-              type="button"
-              onClick={onLaunch}
-              className="relative w-full sm:w-80 h-14 rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-bold text-base shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-3 transition-all active:scale-[0.98] cursor-pointer"
-            >
-              <Sparkles className="w-5 h-5 text-indigo-200" />
-              <span>Launch Voice Interview</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={onLaunch}
+            className="w-full sm:w-80 h-14 rounded-full bg-[#111815] hover:bg-[#202e26] text-white font-black text-base shadow-xl transition-all active:scale-[0.98] flex items-center justify-center gap-3 cursor-pointer group"
+          >
+            <Sparkles className="w-5 h-5 text-yellow-300" />
+            <span>Launch Voice Interview</span>
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </button>
 
           <span className="text-[11px] text-zinc-500 font-mono">
-            Press <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 text-[10px] border border-zinc-700">Enter</kbd> to launch immediately • Spacebar to mute during session
+            Press <kbd className="px-1.5 py-0.5 rounded bg-zinc-200 text-[#111815] text-[10px] border border-zinc-300 font-bold">Enter</kbd> to launch immediately • Spacebar to mute during session
           </span>
         </div>
       </motion.div>
     </div>
   );
 }
-

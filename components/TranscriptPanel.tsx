@@ -3,14 +3,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Volume2,
-  Mic,
   Search,
-  Sparkles,
   Bot,
   User,
   ArrowDown,
-  Tag,
   Clock,
   Zap,
 } from "lucide-react";
@@ -50,40 +46,41 @@ export function TranscriptPanel({
     setAutoScroll(isAtBottom);
   };
 
-  const filteredTranscript = transcript.filter((item) =>
-    item.text.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (item.category && item.category.toLowerCase().includes(searchQuery.toLowerCase()))
+  const filteredTranscript = transcript.filter(
+    (item) =>
+      item.text.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (item.category && item.category.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   const getCategoryBadgeClass = (category?: QuestionCategory) => {
     switch (category) {
       case "Algorithm":
-        return "bg-amber-500/10 text-amber-400 border-amber-500/20";
+        return "bg-[#FEF08A] text-[#713F12] border-[#FDE047]";
       case "Architecture":
-        return "bg-indigo-500/10 text-indigo-400 border-indigo-500/20";
+        return "bg-[#FFEDD5] text-[#C24B1B] border-[#FDBA74]";
       case "Behavioral":
-        return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+        return "bg-[#DCFCE7] text-[#166534] border-[#86EFAC]";
       case "System Design":
-        return "bg-sky-500/10 text-sky-400 border-sky-500/20";
+        return "bg-[#F3E8FF] text-[#581C87] border-[#E9D5FF]";
       case "Coding":
-        return "bg-purple-500/10 text-purple-400 border-purple-500/20";
+        return "bg-[#CCFBF1] text-[#115E59] border-[#99F6E4]";
       default:
-        return "bg-zinc-800 text-zinc-400 border-zinc-700";
+        return "bg-zinc-100 text-zinc-600 border-zinc-200";
     }
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#18181b]/50 rounded-2xl border border-[#27272a] overflow-hidden">
+    <div className="flex flex-col h-full bg-white rounded-3xl border-2 border-[#111815] overflow-hidden shadow-sm">
       {/* Header bar: Search filter + Auto-scroll toggle */}
-      <div className="p-3 border-b border-[#27272a] bg-[#121215]/80 flex items-center justify-between gap-3">
+      <div className="p-3 border-b border-[#E5E0D0] bg-[#FAF8EE] flex items-center justify-between gap-3">
         <div className="relative flex-1">
-          <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search questions or keywords..."
-            className="w-full pl-8 pr-3 py-1.5 rounded-lg bg-zinc-950/80 border border-zinc-800 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-indigo-500/80 transition-colors"
+            className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-white border border-[#E5E0D0] text-xs text-[#111815] placeholder-zinc-400 font-medium focus:outline-none focus:border-[#111815] transition-colors"
           />
         </div>
 
@@ -96,10 +93,10 @@ export function TranscriptPanel({
                 scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
               }
             }}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-indigo-600/80 hover:bg-indigo-500 text-white text-[11px] font-medium shadow transition-colors"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#111815] hover:bg-[#202e26] text-white text-[11px] font-bold shadow-xs transition-colors cursor-pointer"
           >
             <ArrowDown className="w-3 h-3" />
-            <span>Scroll to Live</span>
+            <span>Scroll Live</span>
           </button>
         )}
       </div>
@@ -127,31 +124,31 @@ export function TranscriptPanel({
                 {/* Speaker Header with category badge & timestamp */}
                 <div className="flex items-center gap-2 text-[11px]">
                   {isAI ? (
-                    <div className="flex items-center gap-1.5 text-indigo-400 font-semibold">
-                      <div className="w-5 h-5 rounded-md bg-indigo-500/15 border border-indigo-500/25 flex items-center justify-center">
-                        <Bot className="w-3.5 h-3.5 text-indigo-400" />
+                    <div className="flex items-center gap-1.5 text-[#C24B1B] font-extrabold">
+                      <div className="w-5 h-5 rounded-md bg-[#FFEDD5] border border-[#FDBA74] flex items-center justify-center">
+                        <Bot className="w-3.5 h-3.5 text-[#C24B1B]" />
                       </div>
                       <span>Interviewer AI</span>
                       {isAiSpeaking && (
                         <span className="flex items-center gap-0.5 ml-1">
-                          <span className="w-1 h-2 rounded-full bg-indigo-400 animate-pulse" />
-                          <span className="w-1 h-3 rounded-full bg-indigo-400 animate-pulse delay-75" />
-                          <span className="w-1 h-1.5 rounded-full bg-indigo-400 animate-pulse delay-150" />
+                          <span className="w-1 h-2 rounded-full bg-[#C24B1B] animate-pulse" />
+                          <span className="w-1 h-3 rounded-full bg-[#C24B1B] animate-pulse delay-75" />
+                          <span className="w-1 h-1.5 rounded-full bg-[#C24B1B] animate-pulse delay-150" />
                         </span>
                       )}
                     </div>
                   ) : (
-                    <div className="flex items-center gap-1.5 text-sky-400 font-semibold">
+                    <div className="flex items-center gap-1.5 text-[#0F766E] font-extrabold">
                       {isCandidateSpeaking && (
                         <span className="flex items-center gap-0.5 mr-1">
-                          <span className="w-1 h-1.5 rounded-full bg-sky-400 animate-pulse" />
-                          <span className="w-1 h-3 rounded-full bg-sky-400 animate-pulse delay-75" />
-                          <span className="w-1 h-2 rounded-full bg-sky-400 animate-pulse delay-150" />
+                          <span className="w-1 h-1.5 rounded-full bg-[#0F766E] animate-pulse" />
+                          <span className="w-1 h-3 rounded-full bg-[#0F766E] animate-pulse delay-75" />
+                          <span className="w-1 h-2 rounded-full bg-[#0F766E] animate-pulse delay-150" />
                         </span>
                       )}
                       <span>Candidate</span>
-                      <div className="w-5 h-5 rounded-md bg-sky-500/15 border border-sky-500/25 flex items-center justify-center">
-                        <User className="w-3.5 h-3.5 text-sky-400" />
+                      <div className="w-5 h-5 rounded-md bg-[#CCFBF1] border border-[#99F6E4] flex items-center justify-center">
+                        <User className="w-3.5 h-3.5 text-[#0F766E]" />
                       </div>
                     </div>
                   )}
@@ -159,7 +156,7 @@ export function TranscriptPanel({
                   {/* Category Pill */}
                   {item.category && (
                     <span
-                      className={`px-1.5 py-0.2 rounded text-[10px] font-mono border ${getCategoryBadgeClass(
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold border ${getCategoryBadgeClass(
                         item.category
                       )}`}
                     >
@@ -177,26 +174,26 @@ export function TranscriptPanel({
                 <div
                   className={`max-w-[92%] sm:max-w-[85%] rounded-2xl p-3.5 text-xs sm:text-sm leading-relaxed ${
                     isAI
-                      ? "bg-zinc-900/90 text-zinc-100 border border-zinc-800 rounded-tl-sm shadow-sm"
-                      : "bg-indigo-950/40 text-indigo-100 border border-indigo-500/30 rounded-tr-sm shadow-sm"
+                      ? "bg-[#FAF8EE] text-[#111815] border border-[#E5E0D0] rounded-tl-xs shadow-xs font-medium"
+                      : "bg-[#F3E8FF] text-[#3B0764] border border-[#E9D5FF] rounded-tr-xs shadow-xs font-medium"
                   }`}
                 >
                   <p>{item.text}</p>
 
                   {/* Feedback Tags / Telemetry pills */}
                   {item.feedbackTags && item.feedbackTags.length > 0 && (
-                    <div className="mt-2 pt-2 border-t border-zinc-800/80 flex flex-wrap items-center gap-1.5">
+                    <div className="mt-2.5 pt-2 border-t border-black/10 flex flex-wrap items-center gap-1.5">
                       {item.feedbackTags.map((tag, i) => (
                         <span
                           key={i}
-                          className="px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-800/60 text-zinc-300 border border-zinc-700/60"
+                          className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/80 text-[#111815] border border-black/10"
                         >
                           {tag}
                         </span>
                       ))}
                       {item.latencyMs && (
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-sky-950/60 text-sky-300 border border-sky-800/40 flex items-center gap-1 ml-auto">
-                          <Zap className="w-2.5 h-2.5 fill-sky-400" />
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#DCFCE7] text-[#166534] border border-[#86EFAC] flex items-center gap-1 ml-auto">
+                          <Zap className="w-2.5 h-2.5 fill-[#166534]" />
                           {item.latencyMs}ms
                         </span>
                       )}
@@ -208,7 +205,7 @@ export function TranscriptPanel({
           })}
         </AnimatePresence>
 
-        {/* Live Word-by-Word Streaming Bubble if an utterance is actively streaming */}
+        {/* Live Word-by-Word Streaming Bubble */}
         {streamingText && (
           <motion.div
             initial={{ opacity: 0, y: 6 }}
@@ -219,34 +216,38 @@ export function TranscriptPanel({
           >
             <div className="flex items-center gap-2 text-[11px]">
               {streamingSpeaker === "ai" ? (
-                <div className="flex items-center gap-1.5 text-indigo-400 font-semibold">
-                  <div className="w-5 h-5 rounded-md bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center">
-                    <Bot className="w-3.5 h-3.5 text-indigo-400" />
+                <div className="flex items-center gap-1.5 text-[#C24B1B] font-extrabold">
+                  <div className="w-5 h-5 rounded-md bg-[#FFEDD5] border border-[#FDBA74] flex items-center justify-center">
+                    <Bot className="w-3.5 h-3.5 text-[#C24B1B]" />
                   </div>
                   <span>Interviewer AI</span>
-                  <span className="text-[10px] text-indigo-400/80 animate-pulse">Streaming...</span>
+                  <span className="text-[10px] text-[#C24B1B] font-bold animate-pulse">
+                    Streaming...
+                  </span>
                 </div>
               ) : (
-                <div className="flex items-center gap-1.5 text-sky-400 font-semibold">
-                  <span className="text-[10px] text-sky-400/80 animate-pulse">Transcribing...</span>
+                <div className="flex items-center gap-1.5 text-[#0F766E] font-extrabold">
+                  <span className="text-[10px] text-[#0F766E] font-bold animate-pulse">
+                    Transcribing...
+                  </span>
                   <span>Candidate</span>
-                  <div className="w-5 h-5 rounded-md bg-sky-500/20 border border-sky-500/30 flex items-center justify-center">
-                    <User className="w-3.5 h-3.5 text-sky-400" />
+                  <div className="w-5 h-5 rounded-md bg-[#CCFBF1] border border-[#99F6E4] flex items-center justify-center">
+                    <User className="w-3.5 h-3.5 text-[#0F766E]" />
                   </div>
                 </div>
               )}
             </div>
 
             <div
-              className={`max-w-[92%] sm:max-w-[85%] rounded-2xl p-3.5 text-xs sm:text-sm leading-relaxed border ${
+              className={`max-w-[92%] sm:max-w-[85%] rounded-2xl p-3.5 text-xs sm:text-sm leading-relaxed border-2 ${
                 streamingSpeaker === "ai"
-                  ? "bg-zinc-900 text-zinc-100 border-indigo-500/40 shadow-lg shadow-indigo-950/20"
-                  : "bg-indigo-950/50 text-indigo-100 border-sky-500/40 shadow-lg shadow-sky-950/20"
+                  ? "bg-[#FAF8EE] text-[#111815] border-[#C24B1B] shadow-md"
+                  : "bg-[#F3E8FF] text-[#3B0764] border-[#7E22CE] shadow-md"
               }`}
             >
               <p>
                 {streamingText}
-                <span className="inline-block w-1.5 h-3.5 ml-1 bg-indigo-400 animate-pulse" />
+                <span className="inline-block w-1.5 h-3.5 ml-1 bg-[#C24B1B] animate-pulse" />
               </p>
             </div>
           </motion.div>
@@ -254,14 +255,13 @@ export function TranscriptPanel({
       </div>
 
       {/* Footer Info Pill */}
-      <div className="px-4 py-2 border-t border-[#27272a] bg-[#121215]/90 flex items-center justify-between text-[11px] text-zinc-500 font-mono">
+      <div className="px-4 py-2 border-t border-[#E5E0D0] bg-[#FAF8EE] flex items-center justify-between text-[11px] text-zinc-600 font-mono font-medium">
         <span>{transcript.length} turns recorded</span>
-        <span className="flex items-center gap-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-          Real-time Whisper ASR stream
+        <span className="flex items-center gap-1.5 text-emerald-700 font-bold">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          Real-Time Neural ASR Stream
         </span>
       </div>
     </div>
   );
 }
-

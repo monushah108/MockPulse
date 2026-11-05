@@ -2,13 +2,11 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, FileText, Sparkles, Layers, Sliders, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Header } from "../../components/Header";
 import { PreFlightModal } from "../../components/PreFlightModal";
 import { OrbVisualizer } from "../../components/OrbVisualizer";
-import { TranscriptPanel } from "../../components/TranscriptPanel";
-import { ResumeContextDrawer } from "../../components/ResumeContextDrawer";
 import { BottomDock } from "../../components/BottomDock";
 import { SettingsDrawer } from "../../components/SettingsDrawer";
 import { PostInterviewReport } from "../../components/PostInterviewReport";
@@ -35,9 +33,6 @@ export default function InterviewPage() {
   // Visualizer Orb state: "ai_speaking" | "listening" | "thinking" | "idle"
   const [orbState, setOrbState] = useState<OrbState>("idle");
 
-  // Right-panel active tab: "transcript" | "resume"
-  const [activeTab, setActiveTab] = useState<"transcript" | "resume">("transcript");
-
   // Settings
   const [settings, setSettings] = useState<InterviewSettings>({
     targetRole: "Full-Stack Engineer",
@@ -55,7 +50,7 @@ export default function InterviewPage() {
   // Resume profile
   const [resume, setResume] = useState<ResumeProfile>(DEFAULT_RESUME);
 
-  // Transcript turns & live streaming text
+  // Transcript turns & live streaming text for post-report telemetry
   const [transcript, setTranscript] = useState<TranscriptItem[]>(INITIAL_TRANSCRIPT_DIALOGUES);
   const [streamingText, setStreamingText] = useState<string>("");
   const [streamingSpeaker, setStreamingSpeaker] = useState<"ai" | "candidate">("ai");
@@ -245,10 +240,6 @@ export default function InterviewPage() {
       } else if (e.key === "Enter" && screen === "setup") {
         e.preventDefault();
         handleLaunchInterview();
-      } else if (e.key === "1" && screen === "live") {
-        setActiveTab("transcript");
-      } else if (e.key === "2" && screen === "live") {
-        setActiveTab("resume");
       }
     };
 
@@ -257,7 +248,7 @@ export default function InterviewPage() {
   }, [screen, toggleMute, orbState]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#09090b] text-zinc-100 selection:bg-indigo-500/30 selection:text-indigo-200">
+    <div className="min-h-screen flex flex-col bg-[#FAF8EE] bg-hero-grid text-[#111815] selection:bg-yellow-200 selection:text-black">
       {/* Top Header Bar */}
       <Header
         screen={screen}
@@ -274,12 +265,15 @@ export default function InterviewPage() {
           <div className="w-full max-w-4xl flex items-center justify-between pb-2">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-100 transition-colors py-1 px-2.5 rounded-lg bg-zinc-900/60 border border-zinc-800"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#111815] hover:bg-black/5 transition-colors py-1.5 px-3.5 rounded-full bg-white border border-[#E5E0D0] shadow-xs"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Back to Overview</span>
             </Link>
-            <span className="text-xs text-zinc-500 font-mono">Live Agent Session</span>
+            <div className="flex items-center gap-2 text-xs font-mono font-bold text-zinc-500">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span>MockPulse Engine v2.4</span>
+            </div>
           </div>
         )}
 
@@ -309,7 +303,7 @@ export default function InterviewPage() {
             </motion.div>
           )}
 
-          {/* 2. ACTIVE LIVE INTERVIEW SCREEN (2-Column Split Layout) */}
+          {/* 2. ACTIVE LIVE INTERVIEW SCREEN (Pure Centered Voice Studio) */}
           {screen === "live" && (
             <motion.div
               key="live-screen"
@@ -317,28 +311,28 @@ export default function InterviewPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -14 }}
               transition={{ duration: 0.35 }}
-              className="w-full flex-1 flex flex-col lg:grid lg:grid-cols-12 gap-5 h-[calc(100vh-5.5rem)]"
+              className="w-full flex-1 flex flex-col items-center justify-center h-[calc(100vh-5.5rem)] max-w-4xl mx-auto"
             >
-              {/* Left Panel: Voice & Visual Focus (60% width -> 7 cols on lg) */}
-              <div className="lg:col-span-7 flex flex-col justify-between p-5 sm:p-6 rounded-3xl glass-panel relative overflow-hidden border border-[#27272a] shadow-xl">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-600/10 rounded-full blur-[100px] pointer-events-none" />
+              <div className="w-full h-full flex flex-col justify-between p-6 sm:p-8 rounded-3xl bg-white border-2 border-[#111815] shadow-xl relative overflow-hidden">
+                {/* Subtle warm glow behind orb */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[480px] h-[480px] bg-amber-400/10 rounded-full blur-[110px] pointer-events-none" />
 
-                {/* Sub-Header inside Left Panel */}
+                {/* Sub-Header inside Panel */}
                 <div className="relative z-10 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-xs font-semibold text-zinc-300">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-xs font-black text-[#111815]">
                       Real-Time Voice Pipeline
                     </span>
-                    <span className="text-zinc-600">•</span>
-                    <span className="text-[11px] font-mono text-indigo-400">
+                    <span className="text-zinc-300">•</span>
+                    <span className="text-[11px] font-mono font-bold text-[#C24B1B]">
                       {settings.voiceModel.split(" ")[0]}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2 text-[11px] font-mono text-zinc-400 bg-zinc-950/60 px-2.5 py-1 rounded-lg border border-zinc-800">
-                    <span>Input:</span>
-                    <strong className="text-zinc-200">
+                  <div className="flex items-center gap-2 text-[11px] font-mono font-bold text-zinc-600 bg-[#FAF8EE] px-3 py-1 rounded-full border border-[#E5E0D0] shadow-xs">
+                    <span>Input Gain:</span>
+                    <strong className="text-[#111815]">
                       {isMuted ? "MUTED" : `${micVolume}%`}
                     </strong>
                   </div>
@@ -366,65 +360,6 @@ export default function InterviewPage() {
                     onSimulateAnswer={handleSimulateAnswer}
                     onAskNextQuestion={handleAskNextQuestion}
                   />
-                </div>
-              </div>
-
-              {/* Right Panel: Context & Real-Time Telemetry (40% width -> 5 cols on lg) */}
-              <div className="lg:col-span-5 flex flex-col rounded-3xl glass-panel overflow-hidden border border-[#27272a] shadow-xl">
-                <div className="p-3 border-b border-[#27272a] bg-[#121215]/90 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 p-1 rounded-xl bg-zinc-950/80 border border-zinc-800 text-xs">
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab("transcript")}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all ${
-                        activeTab === "transcript"
-                          ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
-                          : "text-zinc-400 hover:text-zinc-200"
-                      }`}
-                    >
-                      <MessageSquare className="w-3.5 h-3.5" />
-                      <span>Live Transcript</span>
-                      <kbd className="hidden sm:inline text-[9px] px-1 py-0.2 rounded bg-black/30 font-mono">
-                        1
-                      </kbd>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab("resume")}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all ${
-                        activeTab === "resume"
-                          ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
-                          : "text-zinc-400 hover:text-zinc-200"
-                      }`}
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>Resume Context</span>
-                      <kbd className="hidden sm:inline text-[9px] px-1 py-0.2 rounded bg-black/30 font-mono">
-                        2
-                      </kbd>
-                    </button>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono text-zinc-500 hidden sm:inline">
-                      Telemetry v2.4
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex-1 overflow-hidden p-2">
-                  {activeTab === "transcript" ? (
-                    <TranscriptPanel
-                      transcript={transcript}
-                      isAiSpeaking={orbState === "ai_speaking"}
-                      isCandidateSpeaking={orbState === "listening" && micVolume > 20}
-                      streamingText={streamingText}
-                      streamingSpeaker={streamingSpeaker}
-                    />
-                  ) : (
-                    <ResumeContextDrawer resume={resume} />
-                  )}
                 </div>
               </div>
             </motion.div>
@@ -462,4 +397,3 @@ export default function InterviewPage() {
     </div>
   );
 }
-
