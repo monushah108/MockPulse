@@ -1,13 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #09090b;
-  --foreground: #f4f4f5;
-  --surface-primary: #18181b;
-  --surface-secondary: #121215;
-  --border-color: #27272a;
-  --accent-violet: #6366f1;
-  --accent-blue: #38bdf8;
+  --background: #FAF8EE;
+  --foreground: #111815;
+  --accent-terracotta: #C24B1B;
+  --accent-yellow: #FEF08A;
+  --accent-charcoal: #111815;
 }
 
 * {
@@ -15,32 +13,66 @@
 }
 
 body {
-  background-color: #09090b;
-  color: #f4f4f5;
+  background-color: #FAF8EE;
+  color: #111815;
   font-family: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow-x: hidden;
 }
 
+/* Faint Grid Lines for Hero */
+.bg-hero-grid {
+  background-size: 36px 36px;
+  background-image: 
+    linear-gradient(to right, rgba(17, 24, 21, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(17, 24, 21, 0.05) 1px, transparent 1px);
+}
+
+/* Editorial Highlighter Effect */
+.highlighter-marker {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.highlighter-marker::before {
+  content: "";
+  position: absolute;
+  inset: 0.1em -0.15em -0.05em -0.15em;
+  background-color: #FEF08A;
+  z-index: -1;
+  border-radius: 4px;
+  transform: rotate(-0.5deg);
+}
+
+/* Sticky Note Shadow */
+.shadow-sticky {
+  box-shadow: 0 12px 28px -6px rgba(17, 24, 21, 0.18), 0 8px 12px -6px rgba(17, 24, 21, 0.12);
+}
+
+.shadow-video-card {
+  box-shadow: 0 24px 48px -12px rgba(194, 75, 27, 0.25), 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+}
+
 /* Custom Sleek Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(18, 18, 21, 0.6);
+  background: #F4F1E4;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: #D4CEB8;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: #BA4416;
 }
 
-/* Glassmorphism helpers */
+/* Dark Mode Glassmorphism Helpers for Interview Room */
 .glass-panel {
   background: rgba(24, 24, 27, 0.65);
   backdrop-filter: blur(16px);
@@ -56,17 +88,6 @@ body {
   box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 30px -10px rgba(99, 102, 241, 0.15);
 }
 
-.glass-pill {
-  background: rgba(39, 39, 42, 0.5);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(63, 63, 70, 0.5);
-}
-
-/* Radial Glows */
-.glow-primary {
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(56, 189, 248, 0.08) 50%, transparent 70%);
-}
-
 .glow-active-orb {
   filter: drop-shadow(0 0 45px rgba(99, 102, 241, 0.45)) drop-shadow(0 0 85px rgba(56, 189, 248, 0.3));
 }
@@ -79,7 +100,6 @@ body {
   filter: drop-shadow(0 0 40px rgba(168, 85, 247, 0.4)) drop-shadow(0 0 70px rgba(99, 102, 241, 0.25));
 }
 
-/* Pulsing Gradient Border */
 @keyframes pulse-ring {
   0% {
     transform: scale(0.96);

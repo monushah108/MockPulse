@@ -1,456 +1,294 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, FileText, Sparkles, Layers, Sliders } from "lucide-react";
-import { Header } from "../components/Header";
-import { PreFlightModal } from "../components/PreFlightModal";
-import { OrbVisualizer } from "../components/OrbVisualizer";
-import { TranscriptPanel } from "../components/TranscriptPanel";
-import { ResumeContextDrawer } from "../components/ResumeContextDrawer";
-import { BottomDock } from "../components/BottomDock";
-import { SettingsDrawer } from "../components/SettingsDrawer";
-import { PostInterviewReport } from "../components/PostInterviewReport";
-import { useAudioEngine } from "../lib/useAudioEngine";
+import React, { useState } from "react";
+import Link from "next/link";
 import {
-  DEFAULT_RESUME,
-  INITIAL_TRANSCRIPT_DIALOGUES,
-  MOCK_NEXT_QUESTIONS,
-  SAMPLE_POST_REPORT,
-} from "../lib/mockData";
+  Sparkles,
+  ArrowRight,
+  CheckCircle2,
+  Mic,
+  Volume2,
+  FileText,
+  Zap,
+  Play,
+  Layers,
+  Award,
+  Shield,
+  Activity,
+  Menu,
+  X,
+} from "lucide-react";
 import {
-  AppScreen,
-  OrbState,
-  InterviewSettings,
-  ResumeProfile,
-  TranscriptItem,
-  PostInterviewMetrics,
-} from "../types/interview";
+  LinedPaperDoodleLeft,
+  LinedPaperDoodleRight,
+  CurlySketchArrow,
+} from "../components/SketchDoodles";
+import { HeroShowcase } from "../components/HeroShowcase";
+import { TerracottaSection } from "../components/TerracottaSection";
+import { FaqSection } from "../components/FaqSection";
+import { PreFooterBanner, LandingFooter } from "../components/LandingFooter";
 
-export default function Home() {
-  // Screen state: "setup" | "live" | "report"
-  const [screen, setScreen] = useState<AppScreen>("setup");
-
-  // Visualizer Orb state: "ai_speaking" | "listening" | "thinking" | "idle"
-  const [orbState, setOrbState] = useState<OrbState>("idle");
-
-  // Right-panel active tab: "transcript" | "resume"
-  const [activeTab, setActiveTab] = useState<"transcript" | "resume">("transcript");
-
-  // Settings
-  const [settings, setSettings] = useState<InterviewSettings>({
-    targetRole: "Full-Stack Engineer",
-    experienceLevel: "Mid-Level (3-5 yrs)",
-    roundType: "Round 1: Technical & Algorithms",
-    voiceModel: "Nova (Warm & Conversational)",
-    audioInputDevice: "Default Microphone (System Default)",
-    bargeInEnabled: true,
-    noiseSuppression: true,
-    speed: 1.0,
-  });
-
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-
-  // Resume profile
-  const [resume, setResume] = useState<ResumeProfile>(DEFAULT_RESUME);
-
-  // Transcript turns & live streaming text
-  const [transcript, setTranscript] = useState<TranscriptItem[]>(INITIAL_TRANSCRIPT_DIALOGUES);
-  const [streamingText, setStreamingText] = useState<string>("");
-  const [streamingSpeaker, setStreamingSpeaker] = useState<"ai" | "candidate">("ai");
-  const nextQuestionIndexRef = useRef(0);
-
-  // Session duration timer
-  const [durationSeconds, setDurationSeconds] = useState(258); // default to ~04:18 for realistic demo
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Post interview metrics report
-  const [reportMetrics, setReportMetrics] = useState<PostInterviewMetrics>(SAMPLE_POST_REPORT);
-
-  // Web Audio engine
-  const {
-    isMicTesting,
-    micVolume,
-    micDb,
-    frequencyData,
-    isMuted,
-    toggleMicTest,
-    toggleMute,
-    playChime,
-    startMockMic,
-    stopMic,
-  } = useAudioEngine();
-
-  // Update Settings
-  const handleUpdateSettings = (newSettings: Partial<InterviewSettings>) => {
-    setSettings((prev) => ({ ...prev, ...newSettings }));
-  };
-
-  // Launch interview from Pre-Flight
-  const handleLaunchInterview = () => {
-    playChime("start");
-    setScreen("live");
-    setOrbState("listening"); // default to listening for user greeting or AI start
-
-    // Start timer
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setDurationSeconds((prev) => prev + 1);
-    }, 1000);
-  };
-
-  // End Interview Session
-  const handleEndSession = () => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-    stopMic();
-    playChime("complete");
-
-    // Compute updated post-interview metrics
-    setReportMetrics({
-      ...SAMPLE_POST_REPORT,
-      dialogueCount: transcript.length,
-      totalDurationSeconds: durationSeconds,
-    });
-
-    setScreen("report");
-  };
-
-  // Restart Interview to Setup
-  const handleRestart = () => {
-    setDurationSeconds(0);
-    setStreamingText("");
-    setOrbState("idle");
-    setScreen("setup");
-  };
-
-  // Stream text word by word simulation
-  const streamUtterance = useCallback(
-    (
-      fullText: string,
-      speaker: "ai" | "candidate",
-      category?: TranscriptItem["category"],
-      feedbackTags?: string[],
-      onDone?: () => void
-    ) => {
-      setStreamingSpeaker(speaker);
-      const words = fullText.split(" ");
-      let currentIdx = 0;
-      setStreamingText("");
-
-      const interval = setInterval(() => {
-        if (currentIdx < words.length) {
-          setStreamingText(words.slice(0, currentIdx + 1).join(" "));
-          currentIdx++;
-        } else {
-          clearInterval(interval);
-          setStreamingText("");
-
-          const minutes = Math.floor(durationSeconds / 60);
-          const seconds = durationSeconds % 60;
-          const pad = (n: number) => n.toString().padStart(2, "0");
-          const timestamp = `${pad(minutes)}:${pad(seconds)}`;
-
-          const newItem: TranscriptItem = {
-            id: `tx-${Date.now()}`,
-            speaker,
-            text: fullText,
-            timestamp,
-            category,
-            feedbackTags,
-            latencyMs: speaker === "candidate" ? 590 + Math.floor(Math.random() * 80) : undefined,
-          };
-
-          setTranscript((prev) => [...prev, newItem]);
-          if (onDone) onDone();
-        }
-      }, 75);
-    },
-    [durationSeconds]
-  );
-
-  // Interrupt AI Action
-  const handleInterruptAI = () => {
-    if (orbState !== "ai_speaking") return;
-    playChime("interrupt");
-    setStreamingText("");
-    setOrbState("listening");
-
-    // Add barge-in telemetry note to the transcript
-    const newItem: TranscriptItem = {
-      id: `tx-bargein-${Date.now()}`,
-      speaker: "candidate",
-      text: "[Candidate interrupted AI — Barged in with response]",
-      timestamp: "Live",
-      category: "Behavioral",
-      feedbackTags: ["Active Barge-In", "Low Latency Pivot"],
-    };
-    setTranscript((prev) => [...prev, newItem]);
-  };
-
-  // Simulate Candidate Answer
-  const handleSimulateAnswer = () => {
-    const nextItem = MOCK_NEXT_QUESTIONS[nextQuestionIndexRef.current % MOCK_NEXT_QUESTIONS.length];
-    setOrbState("listening");
-
-    streamUtterance(
-      nextItem.candidateAnswer,
-      "candidate",
-      nextItem.category,
-      nextItem.feedbackTags,
-      () => {
-        setOrbState("thinking");
-        setTimeout(() => {
-          handleAskNextQuestion();
-        }, 1200);
-      }
-    );
-  };
-
-  // Ask Next Question from AI
-  const handleAskNextQuestion = () => {
-    const nextItem = MOCK_NEXT_QUESTIONS[nextQuestionIndexRef.current % MOCK_NEXT_QUESTIONS.length];
-    nextQuestionIndexRef.current = (nextQuestionIndexRef.current + 1) % MOCK_NEXT_QUESTIONS.length;
-
-    setOrbState("ai_speaking");
-    streamUtterance(
-      nextItem.aiQuestion,
-      "ai",
-      nextItem.category,
-      ["Next Probing Turn", `${nextItem.category} Question`],
-      () => {
-        setOrbState("listening");
-      }
-    );
-  };
-
-  // Global Keyboard Shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore if user is typing in an input
-      if (
-        e.target instanceof HTMLInputElement ||
-        e.target instanceof HTMLTextAreaElement ||
-        e.target instanceof HTMLSelectElement
-      ) {
-        return;
-      }
-
-      if (e.code === "Space" && screen === "live") {
-        e.preventDefault();
-        toggleMute();
-      } else if ((e.key === "i" || e.key === "I" || e.key === "Escape") && screen === "live") {
-        e.preventDefault();
-        handleInterruptAI();
-      } else if (e.key === "Enter" && screen === "setup") {
-        e.preventDefault();
-        handleLaunchInterview();
-      } else if (e.key === "1" && screen === "live") {
-        setActiveTab("transcript");
-      } else if (e.key === "2" && screen === "live") {
-        setActiveTab("resume");
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [screen, toggleMute, orbState]);
+export default function LandingPage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#09090b] text-zinc-100 selection:bg-indigo-500/30 selection:text-indigo-200">
-      {/* Top Header Bar */}
-      <Header
-        screen={screen}
-        targetRole={settings.targetRole}
-        roundType={settings.roundType}
-        durationSeconds={durationSeconds}
-        onEndSession={handleEndSession}
-        onOpenSettings={() => setIsSettingsOpen(true)}
-      />
+    <div className="min-h-screen flex flex-col bg-[#FAF8EE] text-[#111815] selection:bg-yellow-200 selection:text-black">
+      {/* 1. NAVIGATION BAR */}
+      <nav className="sticky top-0 z-40 w-full bg-[#FAF8EE]/90 backdrop-blur-md border-b border-[#E5E0D0] transition-all">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between gap-4">
+          {/* Left: Brand Logo */}
+          <Link href="/" className="flex items-center gap-2.5 group cursor-pointer">
+            <div className="w-9 h-9 rounded-xl bg-[#FEF08A] border-2 border-[#111815] flex items-center justify-center text-[#111815] font-black text-lg group-hover:scale-105 transition-transform shadow-xs">
+              M
+            </div>
+            <span className="font-black text-xl tracking-tight text-[#111815]">
+              MockPulse
+            </span>
+          </Link>
 
-      {/* Main View Area */}
-      <main className="flex-1 flex flex-col justify-center items-center w-full max-w-7xl mx-auto px-3 sm:px-6 py-4">
-        <AnimatePresence mode="wait">
-          {/* 1. SETUP / PRE-FLIGHT VIEW */}
-          {screen === "setup" && (
-            <motion.div
-              key="setup-screen"
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.3 }}
-              className="w-full"
+          {/* Center: Desktop Navigation Links */}
+          <div className="hidden md:flex items-center gap-8 text-xs font-bold text-[#111815]/80">
+            <Link
+              href="/interview"
+              className="hover:text-[#111815] transition-colors flex items-center gap-1.5"
             >
-              <PreFlightModal
-                settings={settings}
-                resume={resume}
-                onUpdateSettings={handleUpdateSettings}
-                onUpdateResume={setResume}
-                onLaunch={handleLaunchInterview}
-                isMicTesting={isMicTesting}
-                micVolume={micVolume}
-                micDb={micDb}
-                frequencyData={frequencyData}
-                onToggleMicTest={toggleMicTest}
-              />
-            </motion.div>
-          )}
+              <span>Voice Agent</span>
+              <span className="px-1.5 py-0.2 rounded-full text-[9px] font-mono bg-emerald-100 text-emerald-800 border border-emerald-300">
+                LIVE
+              </span>
+            </Link>
+            <a href="#features" className="hover:text-[#111815] transition-colors">
+              Features
+            </a>
+            <a href="#pricing" className="hover:text-[#111815] transition-colors">
+              Pricing
+            </a>
+            <a href="#students" className="hover:text-[#111815] transition-colors">
+              For Students
+            </a>
+            <a href="#faq" className="hover:text-[#111815] transition-colors">
+              FAQ
+            </a>
+          </div>
 
-          {/* 2. ACTIVE LIVE INTERVIEW SCREEN (2-Column Split Layout) */}
-          {screen === "live" && (
-            <motion.div
-              key="live-screen"
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -14 }}
-              transition={{ duration: 0.35 }}
-              className="w-full flex-1 flex flex-col lg:grid lg:grid-cols-12 gap-5 h-[calc(100vh-5.5rem)]"
+          {/* Right: Actions */}
+          <div className="hidden md:flex items-center gap-3">
+            <Link
+              href="/interview"
+              className="px-4 py-2 text-xs font-bold text-[#111815] hover:bg-black/5 rounded-full border border-[#111815]/30 transition-colors"
             >
-              {/* Left Panel: Voice & Visual Focus (60% width -> 7 cols on lg) */}
-              <div className="lg:col-span-7 flex flex-col justify-between p-5 sm:p-6 rounded-3xl glass-panel relative overflow-hidden border border-[#27272a] shadow-xl">
-                {/* Decorative subtle ambient radial light */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-600/10 rounded-full blur-[100px] pointer-events-none" />
+              Log In
+            </Link>
 
-                {/* Sub-Header inside Left Panel */}
-                <div className="relative z-10 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-xs font-semibold text-zinc-300">
-                      Real-Time Voice Pipeline
-                    </span>
-                    <span className="text-zinc-600">•</span>
-                    <span className="text-[11px] font-mono text-indigo-400">
-                      {settings.voiceModel.split(" ")[0]}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2 text-[11px] font-mono text-zinc-400 bg-zinc-950/60 px-2.5 py-1 rounded-lg border border-zinc-800">
-                    <span>Input:</span>
-                    <strong className="text-zinc-200">
-                      {isMuted ? "MUTED" : `${micVolume}%`}
-                    </strong>
-                  </div>
-                </div>
-
-                {/* Central Multi-Wave Animated Orb Visualizer */}
-                <div className="relative z-10 flex-1 flex items-center justify-center py-4">
-                  <OrbVisualizer
-                    state={orbState}
-                    micVolume={micVolume}
-                    frequencyData={frequencyData}
-                    onStateChange={setOrbState}
-                    isMuted={isMuted}
-                  />
-                </div>
-
-                {/* Bottom Floating Dock Controls */}
-                <div className="relative z-20">
-                  <BottomDock
-                    isMuted={isMuted}
-                    onToggleMute={toggleMute}
-                    onInterrupt={handleInterruptAI}
-                    onOpenSettings={() => setIsSettingsOpen(true)}
-                    orbState={orbState}
-                    onSimulateAnswer={handleSimulateAnswer}
-                    onAskNextQuestion={handleAskNextQuestion}
-                  />
-                </div>
-              </div>
-
-              {/* Right Panel: Context & Real-Time Telemetry (40% width -> 5 cols on lg) */}
-              <div className="lg:col-span-5 flex flex-col rounded-3xl glass-panel overflow-hidden border border-[#27272a] shadow-xl">
-                {/* Right Panel Tab Navigation Bar */}
-                <div className="p-3 border-b border-[#27272a] bg-[#121215]/90 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 p-1 rounded-xl bg-zinc-950/80 border border-zinc-800 text-xs">
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab("transcript")}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all ${
-                        activeTab === "transcript"
-                          ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
-                          : "text-zinc-400 hover:text-zinc-200"
-                      }`}
-                    >
-                      <MessageSquare className="w-3.5 h-3.5" />
-                      <span>Live Transcript</span>
-                      <kbd className="hidden sm:inline text-[9px] px-1 py-0.2 rounded bg-black/30 font-mono">
-                        1
-                      </kbd>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab("resume")}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold transition-all ${
-                        activeTab === "resume"
-                          ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
-                          : "text-zinc-400 hover:text-zinc-200"
-                      }`}
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      <span>Resume Context</span>
-                      <kbd className="hidden sm:inline text-[9px] px-1 py-0.2 rounded bg-black/30 font-mono">
-                        2
-                      </kbd>
-                    </button>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono text-zinc-500 hidden sm:inline">
-                      Telemetry v2.4
-                    </span>
-                  </div>
-                </div>
-
-                {/* Tab Views */}
-                <div className="flex-1 overflow-hidden p-2">
-                  {activeTab === "transcript" ? (
-                    <TranscriptPanel
-                      transcript={transcript}
-                      isAiSpeaking={orbState === "ai_speaking"}
-                      isCandidateSpeaking={orbState === "listening" && micVolume > 20}
-                      streamingText={streamingText}
-                      streamingSpeaker={streamingSpeaker}
-                    />
-                  ) : (
-                    <ResumeContextDrawer resume={resume} />
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* 3. POST-INTERVIEW REPORT VIEW */}
-          {screen === "report" && (
-            <motion.div
-              key="report-screen"
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.3 }}
-              className="w-full"
+            <Link
+              href="/interview"
+              className="px-5 py-2.5 rounded-full bg-[#111815] hover:bg-[#202e26] text-white text-xs font-bold shadow-md transition-all active:scale-95 flex items-center gap-1.5"
             >
-              <PostInterviewReport
-                metrics={reportMetrics}
-                transcript={transcript}
-                targetRole={settings.targetRole}
-                roundType={settings.roundType}
-                onRestart={handleRestart}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </main>
+              <span>Start Free Interview</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
 
-      {/* Settings Drawer Modal */}
-      <SettingsDrawer
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        settings={settings}
-        onUpdateSettings={handleUpdateSettings}
-      />
+          {/* Mobile hamburger button */}
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 rounded-xl text-[#111815] hover:bg-black/5"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
+
+        {/* Mobile dropdown menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden px-4 pt-2 pb-6 bg-[#FAF8EE] border-b border-[#E5E0D0] space-y-3">
+            <div className="flex flex-col space-y-2 text-sm font-bold text-[#111815]">
+              <Link
+                href="/interview"
+                onClick={() => setMobileMenuOpen(false)}
+                className="py-2 px-3 rounded-lg hover:bg-black/5 flex items-center justify-between"
+              >
+                <span>Voice Agent</span>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                  Live
+                </span>
+              </Link>
+              <a
+                href="#features"
+                onClick={() => setMobileMenuOpen(false)}
+                className="py-2 px-3 rounded-lg hover:bg-black/5"
+              >
+                Features
+              </a>
+              <a
+                href="#pricing"
+                onClick={() => setMobileMenuOpen(false)}
+                className="py-2 px-3 rounded-lg hover:bg-black/5"
+              >
+                Pricing
+              </a>
+              <a
+                href="#faq"
+                onClick={() => setMobileMenuOpen(false)}
+                className="py-2 px-3 rounded-lg hover:bg-black/5"
+              >
+                FAQ
+              </a>
+            </div>
+
+            <div className="pt-2 flex flex-col gap-2">
+              <Link
+                href="/interview"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full text-center py-2.5 rounded-full bg-[#111815] text-white text-xs font-bold"
+              >
+                Start Free Interview
+              </Link>
+            </div>
+          </div>
+        )}
+      </nav>
+
+      {/* 2. HERO SECTION */}
+      <section className="relative w-full pt-10 sm:pt-16 pb-16 px-4 sm:px-6 bg-hero-grid overflow-hidden">
+        {/* Floating Sketch Doodles on Left and Right (matching reference aesthetic!) */}
+        <div className="hidden lg:block absolute left-4 xl:left-12 top-28 z-10">
+          <LinedPaperDoodleLeft />
+        </div>
+        <div className="hidden lg:block absolute left-8 xl:left-16 top-[370px] z-10">
+          <LinedPaperDoodleRight />
+        </div>
+        <div className="hidden lg:block absolute right-6 xl:right-16 top-32 z-10">
+          <LinedPaperDoodleRight />
+        </div>
+
+        <div className="max-w-4xl mx-auto flex flex-col items-center text-center space-y-6 relative z-20">
+          {/* Top Pill Badge */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#111815] text-white text-xs font-bold tracking-wide shadow-xs">
+            <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
+            <span>Sub-Second Latency Voice AI</span>
+          </div>
+
+          {/* Main Headline with Highlighter Marker */}
+          <h1 className="text-4xl sm:text-6xl lg:text-[68px] font-black tracking-tight text-[#111815] leading-[1.08] max-w-3xl">
+            AI Interviewer to get your dream{" "}
+            <span className="highlighter-marker text-[#111815] px-1">
+              tech job.
+            </span>
+          </h1>
+
+          {/* Subtitle Paragraph */}
+          <p className="text-base sm:text-lg text-[#111815]/75 max-w-2xl leading-relaxed font-medium">
+            Practice real-time conversational technical interviews with sub-second voice latency.
+            Handle dynamic follow-ups, test system architecture, and get instant diagnostic reports
+            tailored to your resume.
+          </p>
+
+          {/* Dual Pill CTA Buttons with Curly Sketch Arrow */}
+          <div className="relative pt-2 flex flex-col sm:flex-row items-center justify-center gap-3.5 w-full sm:w-auto">
+            {/* Curly Hand-drawn Arrow pointing to CTA */}
+            <div className="hidden sm:block absolute -left-20 -top-8 pointer-events-none">
+              <CurlySketchArrow />
+            </div>
+
+            <Link
+              href="/interview"
+              className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-[#111815] hover:bg-[#202e26] text-white font-bold text-sm shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2 group cursor-pointer"
+            >
+              <span>Practice For Free — Try Now!</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+
+            <Link
+              href="/interview"
+              className="w-full sm:w-auto px-6 py-3.5 rounded-full border-2 border-[#111815] hover:bg-[#111815]/5 text-[#111815] font-bold text-sm transition-all active:scale-95 flex items-center justify-center gap-2"
+            >
+              <span>Upload Resume</span>
+            </Link>
+          </div>
+
+          {/* Social Proof: Trusted by engineers at */}
+          <div className="pt-6 sm:pt-8 flex flex-col items-center gap-3">
+            <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider font-mono">
+              Trusted by Candidates & Engineers from:
+            </span>
+
+            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-9 text-zinc-600 font-bold text-sm sm:text-base tracking-tight opacity-75">
+              <span className="hover:opacity-100 transition-opacity">stripe</span>
+              <span className="hover:opacity-100 transition-opacity">HubSpot</span>
+              <span className="hover:opacity-100 transition-opacity">coinbase</span>
+              <span className="hover:opacity-100 transition-opacity">Google</span>
+              <span className="hover:opacity-100 transition-opacity">Meta</span>
+              <span className="hover:opacity-100 transition-opacity">Amazon</span>
+            </div>
+          </div>
+
+          {/* Hero Showcase Video / Demo Player with Terracotta Frame */}
+          <HeroShowcase />
+        </div>
+      </section>
+
+      {/* 3. TERRACOTTA BAND: CHALLENGES IN INTERVIEW PREP */}
+      <div id="features">
+        <TerracottaSection />
+      </div>
+
+      {/* 4. TECHNICAL CAPABILITIES HIGHLIGHTS */}
+      <section className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-20 space-y-14">
+        <div className="flex flex-col items-center text-center space-y-3">
+          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#FEF08A] text-[#713F12] border border-[#FDE047] uppercase font-mono">
+            Engineering Rigor
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-black text-[#111815] tracking-tight">
+            How MockPulse simulates real senior interviews
+          </h2>
+          <p className="text-sm text-zinc-600 max-w-lg">
+            Built from real engineering loops at top tech firms to probe critical thinking and trade-off justification.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Card 1 */}
+          <div className="p-6 rounded-2xl bg-white border border-[#E5E0D0] space-y-3 shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-[#FEF08A] flex items-center justify-center text-[#111815]">
+              <Zap className="w-5 h-5" />
+            </div>
+            <h3 className="text-base font-bold text-[#111815]">Sub-600ms Voice Latency</h3>
+            <p className="text-xs text-zinc-600 leading-relaxed">
+              Powered by real-time WebRTC audio edge inference. Speak, pause, or interrupt with immediate neural turnaround.
+            </p>
+          </div>
+
+          {/* Card 2 */}
+          <div className="p-6 rounded-2xl bg-white border border-[#E5E0D0] space-y-3 shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-[#F3E8FF] flex items-center justify-center text-[#581C87]">
+              <FileText className="w-5 h-5" />
+            </div>
+            <h3 className="text-base font-bold text-[#111815]">Automated Resume Entity Ingestion</h3>
+            <p className="text-xs text-zinc-600 leading-relaxed">
+              Drop your PDF. MockPulse extracts past distributed systems, microservices, and database projects to craft custom probes.
+            </p>
+          </div>
+
+          {/* Card 3 */}
+          <div className="p-6 rounded-2xl bg-white border border-[#E5E0D0] space-y-3 shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-[#CCFBF1] flex items-center justify-center text-[#115E59]">
+              <Award className="w-5 h-5" />
+            </div>
+            <h3 className="text-base font-bold text-[#111815]">Diagnostic Performance Scoring</h3>
+            <p className="text-xs text-zinc-600 leading-relaxed">
+              Receive precise circular progress scores across Technical Clarity, Communication Pacing, Answer Depth, and Filler Word frequency.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. FAQ ACCORDION SECTION */}
+      <FaqSection />
+
+      {/* 6. PRE-FOOTER BANNER & MINIMALIST FOOTER */}
+      <PreFooterBanner />
+      <LandingFooter />
     </div>
   );
 }
