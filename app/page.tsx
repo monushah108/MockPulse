@@ -60,9 +60,6 @@ export default function LandingPage() {
             <a href="#features" className="hover:text-[#111815] transition-colors">
               Features
             </a>
-            <a href="#pricing" className="hover:text-[#111815] transition-colors">
-              Pricing
-            </a>
             <a href="#students" className="hover:text-[#111815] transition-colors">
               For Students
             </a>
@@ -73,13 +70,6 @@ export default function LandingPage() {
 
           {/* Right: Actions */}
           <div className="hidden md:flex items-center gap-3">
-            <Link
-              href="/interview"
-              className="px-4 py-2 text-xs font-bold text-[#111815] hover:bg-black/5 rounded-full border border-[#111815]/30 transition-colors"
-            >
-              Log In
-            </Link>
-
             <Link
               href="/interview"
               className="px-5 py-2.5 rounded-full bg-[#111815] hover:bg-[#202e26] text-white text-xs font-bold shadow-md transition-all active:scale-95 flex items-center gap-1.5"
@@ -121,11 +111,11 @@ export default function LandingPage() {
                 Features
               </a>
               <a
-                href="#pricing"
+                href="#students"
                 onClick={() => setMobileMenuOpen(false)}
                 className="py-2 px-3 rounded-lg hover:bg-black/5"
               >
-                Pricing
+                For Students
               </a>
               <a
                 href="#faq"
