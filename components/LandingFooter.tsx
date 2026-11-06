@@ -114,11 +114,11 @@ export function LandingFooter() {
         {/* Middle sub-row: Terms, Privacy, Support, User Socials */}
         <div className="flex flex-wrap items-center justify-between gap-4 text-xs text-zinc-600 font-medium">
           <div className="flex flex-wrap items-center gap-4">
-            <Link href="/#" className="hover:text-[#111815] transition-colors">
+            <Link href="/terms" className="hover:text-[#111815] transition-colors">
               Terms of Use
             </Link>
             <span className="text-zinc-300">•</span>
-            <Link href="/#" className="hover:text-[#111815] transition-colors">
+            <Link href="/privacy" className="hover:text-[#111815] transition-colors">
               Privacy Policy
             </Link>
             <span className="text-zinc-300">•</span>

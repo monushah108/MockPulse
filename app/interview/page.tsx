@@ -63,14 +63,23 @@ export default function InterviewPage() {
   // Post interview metrics report
   const [reportMetrics, setReportMetrics] = useState<PostInterviewMetrics>(SAMPLE_POST_REPORT);
 
-  // Web Audio engine
+  // Web Audio engine with Voice Validation Suite
   const {
     isMicTesting,
     micVolume,
     micDb,
     frequencyData,
     isMuted,
+    validationStatus,
+    speechProgress,
+    recordedAudioUrl,
+    isPlayingPlayback,
+    isAiSpeakingTest,
+    voiceClarityScore,
+    detectedSnrDb,
     toggleMicTest,
+    playRecordedSample,
+    testAiVoice,
     toggleMute,
     playChime,
     stopMic,
@@ -299,6 +308,15 @@ export default function InterviewPage() {
                 micDb={micDb}
                 frequencyData={frequencyData}
                 onToggleMicTest={toggleMicTest}
+                validationStatus={validationStatus}
+                speechProgress={speechProgress}
+                recordedAudioUrl={recordedAudioUrl}
+                isPlayingPlayback={isPlayingPlayback}
+                isAiSpeakingTest={isAiSpeakingTest}
+                voiceClarityScore={voiceClarityScore}
+                detectedSnrDb={detectedSnrDb}
+                onPlayRecordedSample={playRecordedSample}
+                onTestAiVoice={testAiVoice}
               />
             </motion.div>
           )}
