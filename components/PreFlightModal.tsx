@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FileText,
@@ -19,6 +19,9 @@ import {
   RefreshCw,
   Activity,
   Check,
+  ChevronUp,
+  Code,
+  Layers,
 } from "lucide-react";
 import {
   TARGET_ROLES,
@@ -29,7 +32,8 @@ import {
 } from "../lib/mockData";
 import { ResumeProfile, InterviewSettings } from "../types/interview";
 import { VoiceValidationStatus } from "../lib/useAudioEngine";
-import { StickyPaperclip, LinedPaperDoodleLeft } from "./SketchDoodles";
+import { parseResumeFile } from "../lib/resumeParser";
+import { StickyPaperclip } from "./SketchDoodles";
 
 export interface PreFlightModalProps {
   settings: InterviewSettings;
@@ -52,6 +56,7 @@ export interface PreFlightModalProps {
   detectedSnrDb?: number;
   onPlayRecordedSample?: () => void;
   onTestAiVoice?: (voiceName: string) => void;
+  autoOpenUpload?: boolean;
 }
 
 export function PreFlightModal({
@@ -74,22 +79,44 @@ export function PreFlightModal({
   detectedSnrDb = 26,
   onPlayRecordedSample,
   onTestAiVoice,
+  autoOpenUpload = false,
 }: PreFlightModalProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isParsing, setIsParsing] = useState(false);
+  const [showEntities, setShowEntities] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Handle actual file upload or simulated parsing
-  const handleFileProcess = (file: File) => {
+  // Auto-open file picker if user clicked "Upload Resume" from landing page
+  useEffect(() => {
+    if (autoOpenUpload && fileInputRef.current) {
+      const timer = setTimeout(() => {
+        fileInputRef.current?.click();
+      }, 350);
+      return () => clearTimeout(timer);
+    }
+  }, [autoOpenUpload]);
+
+  // Real-time async resume parsing (PDF, DOCX, TXT, JSON, MD)
+  const handleFileProcess = async (file: File) => {
     setIsParsing(true);
-    setTimeout(() => {
+    try {
+      const parsedResume = await parseResumeFile(file, settings.targetRole);
+      onUpdateResume(parsedResume);
+      setShowEntities(true);
+
+      // Persist in sessionStorage so interview session maintains candidate projects
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("mockpulse_resume", JSON.stringify(parsedResume));
+      }
+    } catch {
       onUpdateResume({
         ...DEFAULT_RESUME,
         fileName: file.name,
         parsedSummary: `${file.name} • 3 Projects Detected • 14 Skills Parsed • 94% Match`,
       });
+    } finally {
       setIsParsing(false);
-    }, 1200);
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -214,8 +241,8 @@ export function PreFlightModal({
           </div>
         </div>
 
-        {/* 2. Resume Upload Dropzone */}
-        <div className="space-y-2">
+        {/* 2. REAL RESUME UPLOAD & ENTITY INGESTION DROPZONE */}
+        <div id="resume-upload" className="space-y-3">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-[#111815] flex items-center gap-1.5">
               <FileText className="w-4 h-4 text-[#C24B1B]" />
@@ -225,6 +252,7 @@ export function PreFlightModal({
               type="button"
               onClick={() => {
                 onUpdateResume(DEFAULT_RESUME);
+                setShowEntities(false);
               }}
               className="text-[11px] text-[#C24B1B] hover:underline font-bold transition-colors cursor-pointer"
             >
@@ -239,14 +267,14 @@ export function PreFlightModal({
             onClick={() => fileInputRef.current?.click()}
             className={`group relative flex flex-col sm:flex-row items-center justify-between p-5 rounded-2xl border-2 border-dashed transition-all cursor-pointer ${
               isDragging
-                ? "border-[#111815] bg-[#FEF08A]/30 shadow-md"
+                ? "border-[#111815] bg-[#FEF08A]/30 shadow-md scale-[1.01]"
                 : "border-[#D4CEB8] bg-[#FAF8EE] hover:bg-[#F4F1E4] hover:border-[#111815]"
             }`}
           >
             <input
               ref={fileInputRef}
               type="file"
-              accept=".pdf,.docx,.txt"
+              accept=".pdf,.docx,.txt,.json,.md"
               className="hidden"
               onChange={(e) => {
                 if (e.target.files && e.target.files[0]) {
@@ -256,22 +284,22 @@ export function PreFlightModal({
             />
 
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#FEF08A] border border-[#FDE047] flex items-center justify-center text-[#713F12] group-hover:scale-105 transition-transform shadow-xs">
+              <div className="w-12 h-12 rounded-2xl bg-[#FEF08A] border border-[#FDE047] flex items-center justify-center text-[#713F12] group-hover:scale-105 transition-transform shadow-xs shrink-0">
                 <UploadCloud className="w-6 h-6" />
               </div>
               <div className="space-y-1 text-center sm:text-left">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
                   <span className="text-sm font-bold text-[#111815]">
-                    {resume.fileName || "Upload Candidate Resume (PDF, DOCX)"}
+                    {resume.fileName || "Upload Candidate Resume (PDF, DOCX, TXT)"}
                   </span>
                   {isParsing ? (
                     <span className="text-[10px] text-[#C24B1B] font-bold animate-pulse">
-                      Parsing entities...
+                      Parsing entities in real-time...
                     </span>
                   ) : (
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#DCFCE7] text-[#166534] border border-[#86EFAC] flex items-center gap-1">
                       <CheckCircle2 className="w-3 h-3" />
-                      Parsed
+                      Parsed & Ready
                     </span>
                   )}
                 </div>
@@ -294,6 +322,71 @@ export function PreFlightModal({
               </span>
             </div>
           </div>
+
+          {/* Toggle Parsed Entities Preview */}
+          <div className="flex items-center justify-between pt-0.5">
+            <button
+              type="button"
+              onClick={() => setShowEntities(!showEntities)}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#111815] hover:text-[#C24B1B] transition-colors cursor-pointer"
+            >
+              <Code className="w-3.5 h-3.5" />
+              <span>{showEntities ? "Hide Parsed Details" : "View Extracted Skills & Projects"}</span>
+              {showEntities ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            </button>
+            <span className="text-[10px] text-zinc-500 font-mono">
+              Candidate: <strong>{resume.candidateName}</strong>
+            </span>
+          </div>
+
+          {/* Expandable Parsed Entities Details Card */}
+          <AnimatePresence>
+            {showEntities && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden space-y-3 p-4 rounded-2xl bg-[#FAF8EE] border border-[#E5E0D0] text-xs text-[#111815]"
+              >
+                <div className="space-y-2">
+                  <span className="font-extrabold uppercase font-mono tracking-wider text-[10px] text-zinc-500">
+                    Extracted Technical Skills:
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {resume.skills.flatMap((cat) => cat.items).map((skill, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2 py-0.5 rounded-md bg-white border border-[#E5E0D0] text-[11px] font-semibold text-[#111815] shadow-2xs"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2 pt-1 border-t border-[#E5E0D0]">
+                  <span className="font-extrabold uppercase font-mono tracking-wider text-[10px] text-zinc-500">
+                    System Architecture Projects Mapped for Live Questions:
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {resume.projects.map((proj) => (
+                      <div key={proj.id} className="p-2.5 rounded-xl bg-white border border-[#E5E0D0] space-y-1">
+                        <span className="font-bold text-[#111815] text-xs line-clamp-1">{proj.name}</span>
+                        <p className="text-[11px] text-zinc-600 line-clamp-2">{proj.description}</p>
+                        <div className="flex flex-wrap gap-1 pt-1">
+                          {proj.technologies.slice(0, 3).map((t, i) => (
+                            <span key={i} className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-zinc-100 text-zinc-700">
+                              {t}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* 3. WORKING TEST VOICE VALIDATION SUITE */}

@@ -10,6 +10,8 @@ import {
   Play,
   RotateCcw,
   Volume2,
+  CheckCircle2,
+  ArrowRight,
 } from "lucide-react";
 import { OrbState } from "../types/interview";
 
@@ -21,6 +23,8 @@ interface BottomDockProps {
   orbState: OrbState;
   onSimulateAnswer: () => void;
   onAskNextQuestion: () => void;
+  onSubmitCandidateAnswer?: () => void;
+  hasSpokenText?: boolean;
 }
 
 export function BottomDock({
@@ -31,12 +35,14 @@ export function BottomDock({
   orbState,
   onSimulateAnswer,
   onAskNextQuestion,
+  onSubmitCandidateAnswer,
+  hasSpokenText = false,
 }: BottomDockProps) {
   return (
     <div className="relative z-30 flex items-center justify-center w-full px-4 py-2">
       {/* Floating Dock Container */}
-      <div className="rounded-3xl bg-white border-2 border-[#111815] px-4 py-3 flex items-center gap-3 sm:gap-4 shadow-xl">
-        {/* 1. Interrupt AI Action Button */}
+      <div className="rounded-3xl bg-white border-2 border-[#111815] px-4 py-3 flex items-center gap-2.5 sm:gap-4 shadow-xl">
+        {/* 1. Interrupt AI Action Button (Active when AI speaks) */}
         <button
           type="button"
           onClick={onInterrupt}
@@ -78,7 +84,20 @@ export function BottomDock({
           </button>
         </div>
 
-        {/* 3. Settings Drawer Trigger */}
+        {/* 3. Done Speaking / Submit Voice Answer Button (Shows when listening) */}
+        {orbState === "listening" && onSubmitCandidateAnswer && (
+          <button
+            type="button"
+            onClick={onSubmitCandidateAnswer}
+            title="Submit your spoken answer to AI (Enter key)"
+            className="flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-md shadow-emerald-600/25 animate-in fade-in"
+          >
+            <CheckCircle2 className="w-4 h-4 text-emerald-200" />
+            <span>Done Speaking</span>
+          </button>
+        )}
+
+        {/* 4. Settings Drawer Trigger */}
         <button
           type="button"
           onClick={onOpenSettings}
@@ -89,7 +108,7 @@ export function BottomDock({
           <span className="hidden md:inline">Settings</span>
         </button>
 
-        {/* 4. Quick Testing Controls (Simulate Speech / Next Question) */}
+        {/* 5. Quick Testing Controls (Simulate Speech / Next Question) */}
         <div className="hidden sm:flex items-center gap-1.5 pl-2 border-l border-zinc-200">
           <button
             type="button"

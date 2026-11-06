@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Sparkles,
   ArrowRight,
@@ -17,7 +18,13 @@ import {
   Activity,
   Menu,
   X,
+  UploadCloud,
+  GraduationCap,
+  BookOpen,
+  Code,
+  Check,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   LinedPaperDoodleLeft,
   LinedPaperDoodleRight,
@@ -27,9 +34,46 @@ import { HeroShowcase } from "../components/HeroShowcase";
 import { TerracottaSection } from "../components/TerracottaSection";
 import { FaqSection } from "../components/FaqSection";
 import { PreFooterBanner, LandingFooter } from "../components/LandingFooter";
+import { parseResumeFile } from "../lib/resumeParser";
+import { ResumeProfile } from "../types/interview";
 
 export default function LandingPage() {
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Resume Upload Modal State
+  const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isParsing, setIsParsing] = useState(false);
+  const [parsedResume, setParsedResume] = useState<ResumeProfile | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Handle resume file parsing on landing page
+  const handleFileProcess = async (file: File) => {
+    setIsParsing(true);
+    try {
+      const parsed = await parseResumeFile(file, "Full-Stack Engineer");
+      setParsedResume(parsed);
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("mockpulse_resume", JSON.stringify(parsed));
+      }
+    } catch {
+      // Fallback
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem(
+          "mockpulse_resume",
+          JSON.stringify({ fileName: file.name })
+        );
+      }
+    } finally {
+      setIsParsing(false);
+    }
+  };
+
+  const handleLaunchWithResume = () => {
+    setIsResumeModalOpen(false);
+    router.push("/interview");
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF8EE] text-[#111815] selection:bg-yellow-200 selection:text-black">
@@ -141,7 +185,7 @@ export default function LandingPage() {
 
       {/* 2. HERO SECTION */}
       <section className="relative w-full pt-10 sm:pt-16 pb-16 px-4 sm:px-6 bg-hero-grid overflow-hidden">
-        {/* Floating Sketch Doodles on Left and Right (matching reference aesthetic!) */}
+        {/* Floating Sketch Doodles */}
         <div className="hidden lg:block absolute left-4 xl:left-12 top-28 z-10">
           <LinedPaperDoodleLeft />
         </div>
@@ -189,12 +233,15 @@ export default function LandingPage() {
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
 
-            <Link
-              href="/interview"
-              className="w-full sm:w-auto px-6 py-3.5 rounded-full border-2 border-[#111815] hover:bg-[#111815]/5 text-[#111815] font-bold text-sm transition-all active:scale-95 flex items-center justify-center gap-2"
+            {/* Upload Resume Button (opens interactive resume modal) */}
+            <button
+              type="button"
+              onClick={() => setIsResumeModalOpen(true)}
+              className="w-full sm:w-auto px-6 py-3.5 rounded-full border-2 border-[#111815] hover:bg-[#111815]/5 text-[#111815] font-bold text-sm transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
             >
+              <UploadCloud className="w-4 h-4 text-[#C24B1B]" />
               <span>Upload Resume</span>
-            </Link>
+            </button>
           </div>
 
           {/* Social Proof: Trusted by engineers at */}
@@ -273,12 +320,206 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 5. FAQ ACCORDION SECTION */}
+      {/* 5. FOR STUDENTS & UNIVERSITY BOOTCAMPS SECTION */}
+      <section id="students" className="w-full bg-[#FFFDF6] border-y border-[#E5E0D0] py-20 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto space-y-12">
+          <div className="flex flex-col items-center text-center space-y-3">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#DCFCE7] text-[#166534] border border-[#86EFAC] text-xs font-bold font-mono uppercase">
+              <GraduationCap className="w-3.5 h-3.5" />
+              <span>Campus & Placement Drive Readiness</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black text-[#111815] tracking-tight">
+              MockPulse for Students & University Bootcamps
+            </h2>
+            <p className="text-sm text-zinc-600 max-w-xl">
+              Eliminate placement anxiety. Rehearse algorithms, system architecture, and STAR behavioral answers with an AI interviewer calibrated to campus placement rubrics.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-6 rounded-3xl bg-white border-2 border-[#111815] shadow-xs space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-[#FEF08A] flex items-center justify-center text-[#713F12]">
+                <BookOpen className="w-5 h-5" />
+              </div>
+              <h3 className="text-base font-bold text-[#111815]">Zero-Anxiety Rehearsal</h3>
+              <p className="text-xs text-zinc-600 leading-relaxed">
+                Practice answering difficult coding edge cases out loud in a safe, judgment-free space before stepping into real FAANG and Tier-1 interviews.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-3xl bg-white border-2 border-[#111815] shadow-xs space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-[#F3E8FF] flex items-center justify-center text-[#581C87]">
+                <GraduationCap className="w-5 h-5" />
+              </div>
+              <h3 className="text-base font-bold text-[#111815]">Campus Placement Rubrics</h3>
+              <p className="text-xs text-zinc-600 leading-relaxed">
+                Evaluations calibrated against new-grad technical hiring standards: data structures, system design fundamentals, and clear communication pacing.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-3xl bg-white border-2 border-[#111815] shadow-xs space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-[#DCFCE7] flex items-center justify-center text-[#166534]">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+              <h3 className="text-base font-bold text-[#111815]">100% Free Practice Tier</h3>
+              <p className="text-xs text-zinc-600 leading-relaxed">
+                Students and bootcamp graduates get instant access to sub-600ms conversational mock interview rounds with zero credit card required.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+            <Link
+              href="/interview?role=Full-Stack%20Engineer"
+              className="px-7 py-3.5 rounded-full bg-[#111815] hover:bg-[#202e26] text-white font-bold text-xs shadow-md transition-all active:scale-95 flex items-center gap-2"
+            >
+              <span>Start Free Student Mock Round</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => setIsResumeModalOpen(true)}
+              className="px-6 py-3.5 rounded-full border border-[#111815] hover:bg-black/5 text-[#111815] font-bold text-xs transition-all active:scale-95"
+            >
+              Upload Campus Resume (PDF)
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. FAQ ACCORDION SECTION */}
       <FaqSection />
 
-      {/* 6. PRE-FOOTER BANNER & MINIMALIST FOOTER */}
+      {/* 7. PRE-FOOTER BANNER & MINIMALIST FOOTER */}
       <PreFooterBanner />
       <LandingFooter />
+
+      {/* INTERACTIVE RESUME UPLOAD MODAL */}
+      <AnimatePresence>
+        {isResumeModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 14 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 14 }}
+              className="w-full max-w-lg bg-[#FAF8EE] rounded-3xl border-2 border-[#111815] shadow-2xl p-6 sm:p-8 space-y-6 text-[#111815] relative"
+            >
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => setIsResumeModalOpen(false)}
+                className="absolute top-5 right-5 p-2 rounded-full hover:bg-black/10 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5 text-[#111815]" />
+              </button>
+
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FEF08A] text-[#713F12] border border-[#FDE047] text-xs font-bold font-mono">
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>Resume Entity Extraction</span>
+                </div>
+                <h3 className="text-2xl font-black tracking-tight">Upload Your Resume</h3>
+                <p className="text-xs text-zinc-600 font-medium">
+                  We extract past distributed systems, microservices, and databases to personalize your AI interviewer questions.
+                </p>
+              </div>
+
+              {/* Dropzone Card */}
+              <div
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragging(true);
+                }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setIsDragging(false);
+                  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    handleFileProcess(e.dataTransfer.files[0]);
+                  }
+                }}
+                onClick={() => fileInputRef.current?.click()}
+                className={`p-6 rounded-2xl border-2 border-dashed transition-all cursor-pointer flex flex-col items-center text-center space-y-3 ${
+                  isDragging
+                    ? "border-[#111815] bg-[#FEF08A]/40"
+                    : "border-[#D4CEB8] bg-white hover:border-[#111815]"
+                }`}
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.docx,.txt,.json,.md"
+                  className="hidden"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      handleFileProcess(e.target.files[0]);
+                    }
+                  }}
+                />
+
+                <div className="w-12 h-12 rounded-2xl bg-[#FEF08A] flex items-center justify-center text-[#713F12]">
+                  <UploadCloud className="w-6 h-6" />
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-xs font-bold text-[#111815] block">
+                    {parsedResume
+                      ? parsedResume.fileName
+                      : "Drag & drop your resume PDF or click to browse"}
+                  </span>
+                  <span className="text-[11px] text-zinc-500 font-mono block">
+                    Supports PDF, DOCX, TXT • Max 10MB
+                  </span>
+                </div>
+
+                {isParsing && (
+                  <span className="text-xs font-bold text-[#C24B1B] animate-pulse">
+                    Extracting technical projects & skills...
+                  </span>
+                )}
+              </div>
+
+              {/* Parsed Result Preview */}
+              {parsedResume && !isParsing && (
+                <div className="p-4 rounded-2xl bg-[#F0FDF4] border border-[#86EFAC] space-y-2 text-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-[#166534] flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      Entities Extracted Successfully
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold font-mono text-[10px]">
+                      {parsedResume.alignmentScore}% Match
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-zinc-600">{parsedResume.parsedSummary}</p>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex items-center gap-3 pt-2">
+                {parsedResume ? (
+                  <button
+                    type="button"
+                    onClick={handleLaunchWithResume}
+                    className="w-full py-3 rounded-full bg-[#111815] hover:bg-[#202e26] text-white text-xs font-bold flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+                  >
+                    <span>Launch Interview with this Resume</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                ) : (
+                  <Link
+                    href="/interview?upload=true"
+                    className="w-full py-3 rounded-full bg-[#111815] hover:bg-[#202e26] text-white text-xs font-bold text-center block cursor-pointer shadow-lg"
+                  >
+                    Continue to Interview Studio Dropzone
+                  </Link>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

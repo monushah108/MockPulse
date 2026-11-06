@@ -72,5 +72,25 @@ export interface PostInterviewMetrics {
   improvements: string[];
   dialogueCount: number;
   totalDurationSeconds: number;
+  fillerDetails?: { word: string; count: number }[];
+  detectedTechKeywords?: string[];
+  speakingDurationFormatted?: string;
+  idealWpmRange?: string;
+  turnDiagnostics?: {
+    turnNumber: number;
+    questionExcerpt: string;
+    category: string;
+    candidateExcerpt: string;
+    wordsSpoken: number;
+    fillersDetected: string[];
+    technicalKeywordsFound: string[];
+    score: number;
+    critique: string;
+  }[];
+  categoryBreakdown?: {
+    category: string;
+    score: number;
+    feedback: string;
+  }[];
 }
 

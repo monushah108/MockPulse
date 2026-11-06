@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import {
   Award,
   CheckCircle2,
   TrendingUp,
-  Download,
   RotateCcw,
   Sparkles,
   FileJson,
@@ -16,6 +15,11 @@ import {
   Zap,
   MessageSquare,
   AlertTriangle,
+  ChevronDown,
+  ChevronUp,
+  Cpu,
+  BookmarkCheck,
+  Check,
 } from "lucide-react";
 import { PostInterviewMetrics, TranscriptItem } from "../types/interview";
 
@@ -95,6 +99,8 @@ export function PostInterviewReport({
   roundType,
   onRestart,
 }: PostInterviewReportProps) {
+  const [showTurnBreakdown, setShowTurnBreakdown] = useState(false);
+
   useEffect(() => {
     try {
       confetti({
@@ -138,7 +144,7 @@ export function PostInterviewReport({
   };
 
   const handleExportTXT = () => {
-    let content = `# MockPulse Voice Interview Report\n`;
+    let content = `# MockPulse Voice Interview Diagnostic Report\n`;
     content += `Target Role: ${targetRole}\nRound: ${roundType}\nOverall Score: ${metrics.overallScore}/100 (${metrics.recommendation})\n`;
     content += `Date: ${new Date().toLocaleString()}\n\n`;
     content += `=== PERFORMANCE METRICS ===\n`;
@@ -146,10 +152,17 @@ export function PostInterviewReport({
     content += `- Communication Pacing: ${metrics.communicationPacing}%\n`;
     content += `- Depth of Answers: ${metrics.depthOfAnswers}%\n`;
     content += `- Average Latency: ${metrics.avgLatencyMs}ms\n`;
-    content += `- Speaking Rate: ${metrics.wpm} words/min\n\n`;
-    content += `=== STRENGTHS ===\n`;
+    content += `- Speaking Rate: ${metrics.wpm} words/min\n`;
+    content += `- Filler Words Detected: ${metrics.fillerWords}\n\n`;
+
+    if (metrics.detectedTechKeywords && metrics.detectedTechKeywords.length > 0) {
+      content += `=== TECHNICAL VOCABULARY ARTICULATED ===\n`;
+      content += `${metrics.detectedTechKeywords.join(", ")}\n\n`;
+    }
+
+    content += `=== KEY STRENGTHS ===\n`;
     metrics.strengths.forEach((s) => (content += `* ${s}\n`));
-    content += `\n=== AREAS FOR IMPROVEMENT ===\n`;
+    content += `\n=== ACTIONABLE AREAS FOR IMPROVEMENT ===\n`;
     metrics.improvements.forEach((i) => (content += `* ${i}\n`));
     content += `\n=== FULL TRANSCRIPT LOG ===\n\n`;
 
@@ -178,6 +191,8 @@ export function PostInterviewReport({
     return `${mins}m ${s}s`;
   };
 
+  const isHire = metrics.recommendation.includes("Hire");
+
   return (
     <div className="relative w-full max-w-4xl mx-auto px-4 py-8 sm:py-12 flex flex-col items-center">
       <motion.div
@@ -190,17 +205,25 @@ export function PostInterviewReport({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-[#E5E0D0]">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono uppercase font-bold bg-[#DCFCE7] text-[#166534] border border-[#86EFAC] flex items-center gap-1">
+              <span
+                className={`px-2.5 py-0.5 rounded-full text-[11px] font-mono uppercase font-bold border flex items-center gap-1 ${
+                  isHire
+                    ? "bg-[#DCFCE7] text-[#166534] border-[#86EFAC]"
+                    : "bg-[#FEF08A] text-[#713F12] border-[#FDE047]"
+                }`}
+              >
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 Session Complete
               </span>
               <span className="text-xs text-zinc-500 font-bold">{targetRole}</span>
+              <span className="text-zinc-300">•</span>
+              <span className="text-xs text-zinc-500 font-bold">{roundType}</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#111815]">
               Candidate Performance Diagnostic
             </h1>
             <p className="text-xs sm:text-sm text-zinc-600 font-medium">
-              Evaluated against real-time voice latency, engineering depth, and communication clarity.
+              Real-time voice acoustics, technical depth, and communication cadence evaluation.
             </p>
           </div>
 
@@ -214,13 +237,23 @@ export function PostInterviewReport({
             </div>
             <div className="space-y-0.5">
               <span className="text-[10px] uppercase tracking-wider font-mono font-bold text-zinc-500">
-                Recommendation
+                Evaluation Decision
               </span>
-              <div className="text-base font-extrabold text-[#166534] flex items-center gap-1.5">
+              <div
+                className={`text-base font-extrabold flex items-center gap-1.5 ${
+                  isHire ? "text-[#166534]" : "text-[#C24B1B]"
+                }`}
+              >
                 <Award className="w-4 h-4" />
                 <span>{metrics.recommendation}</span>
               </div>
-              <span className="text-[11px] text-zinc-500 font-medium">Top 5% percentile candidate</span>
+              <span className="text-[11px] text-zinc-500 font-medium">
+                {metrics.overallScore >= 88
+                  ? "Top 5% percentile candidate"
+                  : metrics.overallScore >= 75
+                  ? "Top 20% engineering bar"
+                  : "Promising baseline; growth targeted"}
+              </span>
             </div>
           </div>
         </div>
@@ -230,10 +263,10 @@ export function PostInterviewReport({
           <div className="flex items-center justify-between">
             <h3 className="text-xs sm:text-sm font-black text-[#111815] flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-[#C24B1B]" />
-              <span>Core Competency Rings</span>
+              <span>Core Diagnostic Competencies</span>
             </h3>
             <span className="text-[11px] font-mono font-bold text-zinc-500">
-              Benchmark: Senior Bar
+              Senior Engineering Benchmark
             </span>
           </div>
 
@@ -267,7 +300,9 @@ export function PostInterviewReport({
               <span>Speaking Pacing</span>
             </span>
             <div className="text-base font-black text-[#111815] font-mono">{metrics.wpm} WPM</div>
-            <span className="text-[10px] text-emerald-700 font-semibold">Optimal cadence (130-160)</span>
+            <span className="text-[10px] text-emerald-700 font-semibold">
+              {metrics.wpm >= 120 && metrics.wpm <= 165 ? "Optimal cadence (125-155)" : "Slight variance"}
+            </span>
           </div>
 
           <div className="p-3.5 rounded-2xl bg-[#FFEDD5]/40 border border-[#FDBA74] space-y-1">
@@ -275,8 +310,14 @@ export function PostInterviewReport({
               <AlertTriangle className="w-3 h-3 text-[#C24B1B]" />
               <span>Filler Words</span>
             </span>
-            <div className="text-base font-black text-[#111815] font-mono">{metrics.fillerWords} detected</div>
-            <span className="text-[10px] text-zinc-600 font-medium">&apos;Um&apos;, &apos;Like&apos; below avg</span>
+            <div className="text-base font-black text-[#111815] font-mono">
+              {metrics.fillerWords} detected
+            </div>
+            <span className="text-[10px] text-zinc-600 font-medium">
+              {metrics.fillerDetails && metrics.fillerDetails.length > 0
+                ? `${metrics.fillerDetails.map((f) => `'${f.word}' (${f.count})`).slice(0, 2).join(", ")}`
+                : "Minimal hesitation tokens"}
+            </span>
           </div>
 
           <div className="p-3.5 rounded-2xl bg-[#DCFCE7]/40 border border-[#86EFAC] space-y-1">
@@ -285,32 +326,55 @@ export function PostInterviewReport({
               <span>Response Latency</span>
             </span>
             <div className="text-base font-black text-[#111815] font-mono">{metrics.avgLatencyMs}ms</div>
-            <span className="text-[10px] text-[#166534] font-semibold">Immediate confidence</span>
+            <span className="text-[10px] text-[#166534] font-semibold">Sub-600ms quick response</span>
           </div>
 
           <div className="p-3.5 rounded-2xl bg-[#F3E8FF]/40 border border-[#E9D5FF] space-y-1">
             <span className="text-[10px] text-[#581C87] uppercase font-mono font-bold flex items-center gap-1">
               <Clock className="w-3 h-3 text-[#7E22CE]" />
-              <span>Total Duration</span>
+              <span>Session Duration</span>
             </span>
             <div className="text-base font-black text-[#111815] font-mono">
               {formatDuration(metrics.totalDurationSeconds)}
             </div>
-            <span className="text-[10px] text-zinc-600 font-medium">{metrics.dialogueCount} question turns</span>
+            <span className="text-[10px] text-zinc-600 font-medium">
+              {metrics.dialogueCount} question turns logged
+            </span>
           </div>
         </div>
 
-        {/* 3. Strengths & Actionable Improvements Grid */}
+        {/* 3. Detected Technical Vocabulary Articulated */}
+        {metrics.detectedTechKeywords && metrics.detectedTechKeywords.length > 0 && (
+          <div className="p-4 rounded-2xl bg-white border border-[#E5E0D0] space-y-2.5">
+            <div className="flex items-center gap-2 text-xs font-bold text-[#111815]">
+              <Cpu className="w-3.5 h-3.5 text-[#C24B1B]" />
+              <span>Technical Vocabulary Articulated in Responses:</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {metrics.detectedTechKeywords.map((keyword) => (
+                <span
+                  key={keyword}
+                  className="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-[#FAF8EE] border border-[#E5E0D0] text-[#111815] flex items-center gap-1 shadow-2xs"
+                >
+                  <Check className="w-3 h-3 text-emerald-600" />
+                  <span>{keyword}</span>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 4. Strengths & Actionable Improvements Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {/* Strengths List */}
           <div className="p-5 rounded-2xl bg-[#DCFCE7]/30 border border-[#86EFAC] space-y-3">
             <div className="flex items-center gap-2 text-[#166534] font-bold text-xs sm:text-sm">
               <CheckCircle2 className="w-4 h-4" />
-              <span>Key Strengths Observed</span>
+              <span>Observed Performance Strengths</span>
             </div>
-            <ul className="space-y-2 text-xs text-[#14532D] font-medium">
+            <ul className="space-y-2.5 text-xs text-[#14532D] font-medium">
               {metrics.strengths.map((s, idx) => (
-                <li key={idx} className="flex items-start gap-2 leading-relaxed">
+                <li key={idx} className="flex items-start gap-2.5 leading-relaxed">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#166534] mt-1.5 shrink-0" />
                   <span>{s}</span>
                 </li>
@@ -322,11 +386,11 @@ export function PostInterviewReport({
           <div className="p-5 rounded-2xl bg-[#FEF08A]/30 border border-[#FDE047] space-y-3">
             <div className="flex items-center gap-2 text-[#854D0E] font-bold text-xs sm:text-sm">
               <TrendingUp className="w-4 h-4" />
-              <span>Actionable Growth Areas</span>
+              <span>Actionable Growth Directives</span>
             </div>
-            <ul className="space-y-2 text-xs text-[#713F12] font-medium">
+            <ul className="space-y-2.5 text-xs text-[#713F12] font-medium">
               {metrics.improvements.map((imp, idx) => (
-                <li key={idx} className="flex items-start gap-2 leading-relaxed">
+                <li key={idx} className="flex items-start gap-2.5 leading-relaxed">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#854D0E] mt-1.5 shrink-0" />
                   <span>{imp}</span>
                 </li>
@@ -335,7 +399,59 @@ export function PostInterviewReport({
           </div>
         </div>
 
-        {/* 4. Action Buttons & Export Section */}
+        {/* 5. Turn-by-Turn Diagnostic Breakdown (Collapsible) */}
+        {metrics.turnDiagnostics && metrics.turnDiagnostics.length > 0 && (
+          <div className="rounded-2xl border border-[#E5E0D0] overflow-hidden bg-[#FAF8EE]">
+            <button
+              type="button"
+              onClick={() => setShowTurnBreakdown(!showTurnBreakdown)}
+              className="w-full p-4 flex items-center justify-between text-left hover:bg-black/5 transition-colors cursor-pointer"
+            >
+              <div className="flex items-center gap-2.5 text-xs sm:text-sm font-black text-[#111815]">
+                <BookmarkCheck className="w-4 h-4 text-[#C24B1B]" />
+                <span>Detailed Turn-by-Turn Diagnostic Evaluation</span>
+                <span className="text-[11px] font-mono text-zinc-500 font-bold">
+                  ({metrics.turnDiagnostics.length} turns evaluated)
+                </span>
+              </div>
+              {showTurnBreakdown ? (
+                <ChevronUp className="w-4 h-4 text-zinc-600" />
+              ) : (
+                <ChevronDown className="w-4 h-4 text-zinc-600" />
+              )}
+            </button>
+
+            {showTurnBreakdown && (
+              <div className="p-4 pt-0 space-y-3 divide-y divide-[#E5E0D0]">
+                {metrics.turnDiagnostics.map((turn) => (
+                  <div key={turn.turnNumber} className="pt-3 space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded-md bg-[#FEF08A] font-mono font-bold text-[#713F12] text-[10px]">
+                          Turn #{turn.turnNumber}
+                        </span>
+                        <span className="font-bold text-[#111815]">{turn.category}</span>
+                      </div>
+                      <span className="font-mono font-black text-[#166534] bg-[#DCFCE7] px-2 py-0.5 rounded-md text-xs">
+                        Score: {turn.score}%
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-zinc-600 italic pl-2 border-l-2 border-zinc-300">
+                      &ldquo;{turn.candidateExcerpt}&rdquo;
+                    </p>
+
+                    <p className="text-xs font-semibold text-[#111815] flex items-center gap-1.5">
+                      <span className="text-[#C24B1B] font-bold">Critique:</span> {turn.critique}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 6. Action Buttons & Export Section */}
         <div className="pt-4 border-t border-[#E5E0D0] flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <button
