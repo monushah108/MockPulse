@@ -4,7 +4,28 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "MockPulse | Sub-Second Latency Real-Time AI Voice Mock Interviews",
   description:
-    "AI Interviewer to get your dream tech job. Real-time conversational voice mock interviews with instant interruption handling, resume-tailored architecture questions, and deep diagnostic scoring.",
+    "AI Interviewer to get your dream tech job. Real-time conversational voice mock interviews with instant interruption handling, resume-tailored architecture questions, and deep diagnostic scoring. Engineered by Monu Shah (@monushah108).",
+  authors: [{ name: "Monu Shah", url: "https://github.com/monushah108" }],
+  creator: "Monu Shah",
+  publisher: "Monu Shah",
+  keywords: [
+    "MockPulse",
+    "Monu Shah",
+    "AI Voice Interview",
+    "Real-time Speech Synthesis",
+    "Full-Stack Mock Interview",
+    "System Design Interview",
+    "Next.js 16",
+    "React 19",
+  ],
+  openGraph: {
+    title: "MockPulse | Real-Time AI Voice Mock Interviews by Monu Shah",
+    description:
+      "Sub-Second Latency Real-Time AI Voice Mock Interview Agent engineered by Monu Shah (@monushah108).",
+    url: "https://github.com/monushah108/mockpulse",
+    siteName: "MockPulse by Monu Shah",
+    type: "website",
+  },
   icons: {
     icon: "/favicon.ico",
   },

@@ -31,14 +31,14 @@ export const VOICE_MODELS = [
 ] as const;
 
 export const DEFAULT_RESUME: ResumeProfile = {
-  fileName: "monu_kumar_senior_fullstack.pdf",
-  candidateName: "Monu Kumar",
+  fileName: "monu_shah_senior_fullstack.pdf",
+  candidateName: "Monu Shah",
   targetRole: "Full-Stack Engineer",
   experienceLevel: "Mid-Level (3-5 yrs)",
-  parsedSummary: "3 Projects Detected • 14 Core Skills • 94% Role Alignment",
+  parsedSummary: "3 Projects Detected • 14 Core Skills • 96% Role Alignment",
   skillsCount: 14,
   projectsCount: 3,
-  alignmentScore: 94,
+  alignmentScore: 96,
   skills: [
     {
       category: "Frontend & UI",

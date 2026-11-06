@@ -1,5 +1,13 @@
 "use client";
 
+/**
+ * MockPulse Web Audio & Voice Validation Suite
+ * Engineered by Monu Shah (@monushah108)
+ *
+ * Provides real-time 16-band FFT spectral analysis, SNR calculations,
+ * and audio loopback calibration.
+ */
+
 import { useState, useEffect, useRef, useCallback } from "react";
 
 export type VoiceValidationStatus =

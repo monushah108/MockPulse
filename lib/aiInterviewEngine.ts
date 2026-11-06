@@ -1,5 +1,13 @@
 "use client";
 
+/**
+ * MockPulse AI Interview & Voice Interaction Engine
+ * Engineered by Monu Shah (@monushah108)
+ *
+ * Implements real-time neural speech synthesis, Web Speech API integration,
+ * adaptive question progression, and contextual resume follow-up generation.
+ */
+
 import { QuestionCategory, ResumeProfile, ResumeProject } from "../types/interview";
 
 export interface AIInterviewQuestion {

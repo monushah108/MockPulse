@@ -483,6 +483,27 @@ export function PostInterviewReport({
             </button>
           </div>
         </div>
+
+        {/* Creator Attribution Footer Note */}
+        <div className="pt-1 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-zinc-500 font-medium border-t border-[#E5E0D0]/60">
+          <div className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span>
+              MockPulse Neural Diagnostic Engine v2.4 • Engineered by{" "}
+              <strong className="text-[#111815]">Monu Shah</strong> (
+              <a
+                href="https://github.com/monushah108"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline text-[#C24B1B] font-bold"
+              >
+                @monushah108
+              </a>
+              )
+            </span>
+          </div>
+          <span className="font-mono text-zinc-400">Principal & Senior Bar Rubric</span>
+        </div>
       </motion.div>
     </div>
   );

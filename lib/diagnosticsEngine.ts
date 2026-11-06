@@ -1,5 +1,13 @@
 "use client";
 
+/**
+ * MockPulse Candidate Performance Diagnostic Engine
+ * Engineered by Monu Shah (@monushah108)
+ *
+ * Evaluates candidate response telemetry: words per minute (WPM), hesitation filler tokens,
+ * technical vocabulary depth, and STAR framework resolution.
+ */
+
 import { PostInterviewMetrics, TranscriptItem, ResumeProfile } from "../types/interview";
 
 // Core technical vocabulary dictionary by engineering domain

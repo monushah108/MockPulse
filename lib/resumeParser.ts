@@ -1,5 +1,12 @@
 "use client";
 
+/**
+ * MockPulse Universal Resume Ingestion & Parsing Engine
+ * Engineered by Monu Shah (@monushah108)
+ *
+ * Client-side multi-format entity extractor supporting PDF, DOCX, TXT, JSON, and Markdown.
+ */
+
 import { ResumeProfile, SkillCategory, ResumeProject } from "../types/interview";
 
 // Comprehensive technology dictionary for parsing

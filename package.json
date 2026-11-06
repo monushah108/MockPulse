@@ -1,6 +1,24 @@
 {
-  "name": "vocalhire",
-  "version": "0.1.0",
+  "name": "mockpulse",
+  "version": "1.0.0",
+  "description": "Sub-Second Latency Real-Time AI Voice Mock Interview Agent engineered by Monu Shah",
+  "author": "Monu Shah <sonuk627422@gmail.com> (https://github.com/monushah108)",
+  "homepage": "https://github.com/monushah108/mockpulse",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/monushah108/mockpulse.git"
+  },
+  "keywords": [
+    "ai-interview",
+    "voice-ai",
+    "mock-interview",
+    "real-time-audio",
+    "web-audio-api",
+    "speech-synthesis",
+    "nextjs",
+    "react-19",
+    "tailwind-css"
+  ],
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",

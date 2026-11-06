@@ -188,8 +188,29 @@ export function LandingFooter() {
             </div>
           </div>
 
-          {/* Multi-column navigation links - ALL FULLY FUNCTIONAL */}
-
+          {/* Creator Attribution & Tech Specs Bar */}
+          <div className="pt-6 border-t border-[#E5E0D0] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-600 font-medium">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>
+                Designed & Engineered from scratch by <strong className="text-[#111815]">Monu Shah</strong> (
+                <a
+                  href="https://github.com/monushah108"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline text-[#C24B1B] font-bold"
+                >
+                  @monushah108
+                </a>
+                )
+              </span>
+            </div>
+            <div className="flex items-center gap-3 text-[11px] font-mono text-zinc-500">
+              <span>Next.js 16 • React 19 • Web Audio API</span>
+              <span>•</span>
+              <span>MIT License</span>
+            </div>
+          </div>
 
           {/* Oversized Brand Typography Watermark at bottom */}
           <div className="pt-4 select-none pointer-events-none overflow-hidden flex justify-center items-center">
